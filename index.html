@@ -172,8 +172,9 @@ button { font: inherit; }
 .artist__cta { font-size: 13px; font-weight: 600; color: var(--accent-3); }
 
 .artists__hint { margin: 0; font-size: 13px; }
-@media (hover: hover) and (pointer: fine) {
-  .artists__track { overflow-x: hidden; cursor: ew-resize; }
+.artists__track { cursor: ew-resize; }
+@media (hover: hover) {
+  .artists__track { overflow-x: hidden; scroll-snap-type: none; }
 }
 @media (hover: none) { .artists__hint { display: none; } }
 
@@ -339,7 +340,7 @@ button { font: inherit; }
               <h2 id="artists-title">Artistas con los que trabajamos</h2>
             </div>
           </div>
-          <p class="muted artists__hint">Pasa el ratón por los artistas para recorrerlos</p>
+          <p class="muted artists__hint">Lleva el ratón a un lado u otro para recorrer los artistas</p>
         </div>
         <div class="artists__track" id="artistsTrack"></div>
       </section>
@@ -370,6 +371,7 @@ button { font: inherit; }
         <a href="/aviso-legal">Aviso legal</a>
         <a href="/privacidad">Privacidad</a>
         <a href="/cookies">Cookies</a>
+        <a href="/admin" rel="nofollow">admin</a>
       </nav>
       <a href="mailto:info@distronow.com" class="mono">info@distronow.com</a>
     </footer>
@@ -636,23 +638,34 @@ button { font: inherit; }
       .catch(function () { /* se queda el respaldo con iniciales */ });
 
     var tr = $('#artistsTrack');
-    var fine = window.matchMedia && window.matchMedia('(hover: hover) and (pointer: fine)').matches;
-    if (!fine) return;
-    var target = 0, raf = null;
-    function step() {
-      var cur = tr.scrollLeft;
-      var next = reduceMotion ? target : cur + (target - cur) * 0.12;
-      tr.scrollLeft = next;
-      raf = Math.abs(target - next) > 0.5 ? requestAnimationFrame(step) : null;
+    if (reduceMotion) { tr.style.overflowX = 'auto'; return; }
+    // Velocidad 1 (muy lenta) a 10 (rápida). Se ajusta desde /admin → Ajustes.
+    var level = 3;
+    fetch('/api/settings')
+      .then(function (r) { return r.ok ? r.json() : {}; })
+      .then(function (cfg) { var v = Number(cfg && cfg.carouselSpeed); if (v >= 1 && v <= 10) level = v; })
+      .catch(function () { /* se queda la velocidad por defecto */ });
+
+    var dir = 0, raf = null, pos = 0;
+    function maxSpeed() { return 0.25 * level; } // píxeles por fotograma (nivel 3 ≈ 45 px/s)
+    function loop() {
+      var max = tr.scrollWidth - tr.clientWidth;
+      if (dir === 0 || max <= 0) { raf = null; return; }
+      pos = Math.max(0, Math.min(max, pos + dir * maxSpeed()));
+      tr.scrollLeft = pos;
+      raf = requestAnimationFrame(loop);
     }
-    tr.addEventListener('mousemove', function (e) {
+    function aim(clientX) {
       var r = tr.getBoundingClientRect();
-      var margin = 0.12; // zonas muertas en los bordes para llegar al principio y al final
-      var x = (e.clientX - r.left) / r.width;
-      var t = Math.max(0, Math.min(1, (x - margin) / (1 - 2 * margin)));
-      target = t * (tr.scrollWidth - tr.clientWidth);
-      if (!raf) raf = requestAnimationFrame(step);
-    });
+      var x = (clientX - r.left) / r.width * 2 - 1;      // -1 (izquierda) … 1 (derecha)
+      var dead = 0.2;                                    // zona central sin movimiento
+      dir = Math.abs(x) < dead ? 0 : (x - Math.sign(x) * dead) / (1 - dead);
+      dir = dir * Math.abs(dir);                         // arranque suave cerca del centro
+      if (dir !== 0 && !raf) { pos = tr.scrollLeft; raf = requestAnimationFrame(loop); }
+    }
+    tr.addEventListener('pointermove', function (e) { if (e.pointerType !== 'touch') aim(e.clientX); });
+    tr.addEventListener('mousemove', function (e) { aim(e.clientX); });
+    tr.addEventListener('mouseleave', function () { dir = 0; });
   }
 
   /* ---------- Partners ---------- */

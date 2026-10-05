@@ -52,6 +52,8 @@ main{padding:28px 0 60px}
 .order button{width:28px;height:22px;border-radius:6px;border:1px solid var(--line);background:transparent;color:var(--text2);cursor:pointer;padding:0;line-height:1}
 .thumb{width:64px;height:44px;border-radius:8px;background:#0A1824;display:flex;align-items:center;justify-content:center;overflow:hidden;font-family:'Archivo',sans-serif;font-weight:900;color:#fff}
 .thumb img{max-width:100%;max-height:100%;object-fit:contain}
+#aList .thumb{width:52px;height:52px;border-radius:50%}
+#aList .thumb img{width:100%;height:100%;max-width:none;max-height:none;object-fit:cover}
 .info{min-width:0;display:flex;flex-direction:column;gap:4px}
 .info input{min-height:34px}
 .sub{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:12px;color:var(--muted)}
@@ -97,11 +99,12 @@ main{padding:28px 0 60px}
       <div class="tabs" role="tablist">
         <button class="tab" role="tab" aria-selected="true" data-tab="artists">Artistas</button>
         <button class="tab" role="tab" aria-selected="false" data-tab="partners">Partners</button>
+        <button class="tab" role="tab" aria-selected="false" data-tab="settings">Ajustes</button>
       </div>
 
       <!-- Artistas -->
       <div id="tab-artists" class="card">
-        <p class="help">Pega el enlace del perfil de Spotify (Spotify → perfil del artista → ⋯ → Compartir → Copiar enlace). Solo se muestran en la web los artistas marcados como visibles, en este orden, hasta 50.</p>
+        <p class="help">Comprueba con la foto que el enlace es del artista correcto. Pega el enlace del perfil de Spotify (Spotify → perfil del artista → ⋯ → Compartir → Copiar enlace). Solo se muestran en la web los artistas marcados como visibles, en este orden, hasta 50.</p>
         <form class="toolbar" id="artistForm">
           <label>Nombre<input type="text" id="aName" required placeholder="Nombre del artista"></label>
           <label>Enlace de Spotify<input type="url" id="aLink" placeholder="https://open.spotify.com/artist/…"></label>
@@ -124,6 +127,19 @@ main{padding:28px 0 60px}
           <button class="btn btn--primary" type="submit" id="pSubmit">Añadir partner</button>
         </form>
         <div class="list" id="pList"></div>
+      </div>
+      <!-- Ajustes -->
+      <div id="tab-settings" class="card" hidden>
+        <h2 style="margin:0 0 6px;font-family:'Archivo',sans-serif;font-stretch:112%;font-weight:800;font-size:18px">Velocidad del carrusel de artistas</h2>
+        <p class="help">Cuánto se desplazan las fotos al llevar el ratón a un lado. 1 es muy lento y 10 es rápido.</p>
+        <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;max-width:560px">
+          <span style="font-size:13px;color:var(--muted)">Lento</span>
+          <input type="range" id="speed" min="1" max="10" step="1" value="3" style="flex:1;min-width:200px;accent-color:var(--accent)" aria-label="Velocidad del carrusel">
+          <span style="font-size:13px;color:var(--muted)">Rápido</span>
+          <output id="speedOut" style="font-family:'IBM Plex Mono',monospace;font-weight:600;min-width:28px;text-align:center">3</output>
+        </div>
+        <div style="margin-top:18px"><button class="btn btn--primary" id="saveSettings">Guardar ajustes</button></div>
+        <p class="help" style="margin-top:12px">Los cambios se ven en la web en un minuto aproximadamente.</p>
       </div>
     </section>
   </main>
@@ -176,7 +192,7 @@ main{padding:28px 0 60px}
   function enter() {
     $('#loginForm').hidden = true; $('#app').hidden = false; $('#hdrActions').hidden = false;
     sb.from('admins').select('email').then(function (r) { $('#notAdmin').hidden = !!(r.data && r.data.length); });
-    loadArtists(); loadPartners();
+    loadArtists(); loadPartners(); loadSettings();
   }
 
   document.querySelectorAll('[data-tab]').forEach(function (b) {
@@ -184,6 +200,7 @@ main{padding:28px 0 60px}
       document.querySelectorAll('[data-tab]').forEach(function (x) { x.setAttribute('aria-selected', x === b); });
       $('#tab-artists').hidden = b.dataset.tab !== 'artists';
       $('#tab-partners').hidden = b.dataset.tab !== 'partners';
+      $('#tab-settings').hidden = b.dataset.tab !== 'settings';
     });
   });
 
@@ -219,7 +236,7 @@ main{padding:28px 0 60px}
       var link = a.spotify_id ? 'https://open.spotify.com/artist/' + a.spotify_id : '';
       return '<div class="row' + (a.visible ? '' : ' is-hidden') + '" data-i="' + i + '">' +
         '<div class="order"><button title="Subir" data-act="up">▲</button><button title="Bajar" data-act="down">▼</button></div>' +
-        '<div class="thumb">' + esc(initials(a.name)) + '</div>' +
+        '<div class="thumb">' + (a.spotify_id ? '<img src="/api/foto?id=' + a.spotify_id + '" alt="" loading="lazy" onerror="this.replaceWith(document.createTextNode(\'' + esc(initials(a.name)) + '\'))">' : esc(initials(a.name))) + '</div>' +
         '<div class="info"><input type="text" value="' + esc(a.name) + '" data-field="name" aria-label="Nombre">' +
         '<div class="sub"><span class="pos">#' + (i + 1) + '</span>' +
         (a.spotify_id ? '<span class="tag tag--ok">Spotify</span><a href="' + link + '" target="_blank" rel="noopener">abrir perfil</a>' : '<span class="tag tag--warn">Sin enlace</span>') +
@@ -270,6 +287,23 @@ main{padding:28px 0 60px}
     sb.from('artists').insert({ name: name, spotify_id: id || null, visible: vis < MAX_VISIBLE, position: artists.length + 1 }).then(function (r) {
       if (r.error) return fail(r.error);
       $('#artistForm').reset(); toast(vis < MAX_VISIBLE ? 'Artista añadido y visible' : 'Artista añadido (oculto: ya hay 50 visibles)'); loadArtists();
+    });
+  });
+
+  /* ---------- Ajustes ---------- */
+  function loadSettings() {
+    sb.from('settings').select('key,value').then(function (r) {
+      if (r.error) return; // la tabla aún no existe: ejecutar supabase/settings.sql
+      (r.data || []).forEach(function (f) {
+        if (f.key === 'carousel_speed') { $('#speed').value = f.value; $('#speedOut').textContent = f.value; }
+      });
+    });
+  }
+  $('#speed').addEventListener('input', function () { $('#speedOut').textContent = this.value; });
+  $('#saveSettings').addEventListener('click', function () {
+    sb.from('settings').upsert({ key: 'carousel_speed', value: String($('#speed').value) }).then(function (r) {
+      if (r.error) return fail(r.error);
+      toast('Ajustes guardados');
     });
   });
 

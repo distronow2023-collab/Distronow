@@ -4,7 +4,7 @@
 - `index.html` · la web (estilos, código y logos van dentro del propio archivo).
 - `admin.html` · panel para gestionar artistas y partners → `/admin`.
 - `aviso-legal.html`, `privacidad.html`, `cookies.html` · páginas legales (BORRADOR: revisar con SFTL y rellenar lo marcado entre [CORCHETES]).
-- `api/` · funciones de Vercel: `artistas` (fotos de Spotify), `partners`, `config`.
+- `api/` · funciones de Vercel: `artistas` (fotos de Spotify), `partners`, `config`, `foto` (miniaturas del panel), `settings` (ajustes como la velocidad del carrusel).
 - `supabase/schema.sql` · base de datos del panel (se ejecuta una vez en Supabase).
 - `vercel.json` · URLs limpias (/aviso-legal en vez de /aviso-legal.html).
 
@@ -23,3 +23,12 @@ Sin los pasos 1–6 la web funciona igual con la lista de artistas de respaldo y
 - Artistas: añadir con nombre + enlace de Spotify, marcar visible (máx. 50), ordenar con ▲▼, eliminar.
 - Partners: nombre, web y logo (PNG/SVG transparente). Aparecen en "Trabajamos con".
 - Los cambios se ven en la web en unos 5 minutos (caché).
+
+## Artistas cargados
+- 15 visibles con enlace.
+- 8 candidatos con enlace, ocultos (Uzii Gaang, Nuttyrn, DD Evans, Sersy 23, Musy Lvp, Elmynor, GRETY EL34, R. Black Mamba): revisar la foto en /admin y marcar visibles.
+- 27 candidatos sin enlace: pegar el enlace de Spotify desde /admin.
+
+## Ajustes
+- Velocidad del carrusel de artistas: /admin → Ajustes (1 muy lento … 10 rápido; por defecto 3).
+- Si ya habías ejecutado `schema.sql` antes de esta versión, ejecuta también `supabase/settings.sql` en el SQL Editor de Supabase.
