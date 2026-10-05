@@ -61,12 +61,24 @@ create policy "partners_logos_admin_write" on storage.objects for all
   using (bucket_id = 'partners' and public.is_admin())
   with check (bucket_id = 'partners' and public.is_admin());
 
+-- 4b) Ajustes de la web (velocidad del carrusel, etc.)
+create table if not exists public.settings (
+  key text primary key,
+  value text not null
+);
+alter table public.settings enable row level security;
+drop policy if exists "settings_public_read" on public.settings;
+create policy "settings_public_read" on public.settings for select using (true);
+drop policy if exists "settings_admin_write" on public.settings;
+create policy "settings_admin_write" on public.settings for all using (public.is_admin()) with check (public.is_admin());
+insert into public.settings (key, value) values ('carousel_speed', '3') on conflict (key) do nothing;
+
 -- 5) Administradores: CAMBIA estos emails por los de los socios
 insert into public.admins (email) values
   ('info@distronow.com')
 on conflict do nothing;
 
--- 6) Artistas iniciales (los 15 con enlace visibles; 35 candidatos ocultos sin enlace)
+-- 6) Artistas iniciales: 15 visibles con enlace; 35 candidatos ocultos (8 ya con enlace, 27 pendientes de pegar desde /admin)
 insert into public.artists (name, spotify_id, visible, position) values
   ('Qba0gang', '2NMRlEX8JsYhetkzAEei4F', true, 1),
   ('Pochi', '7wbgA4GKIqnYmnUUJbRdrb', true, 2),
@@ -83,12 +95,12 @@ insert into public.artists (name, spotify_id, visible, position) values
   ('Mendez 47', '2UqlJuqPrNCJPVFa9cOEtg', true, 13),
   ('Dylanss0n', '0MjDqqTA28UrUZhOiRRour', true, 14),
   ('Sav28', '40mwZLIT1HDEiJ5YjqvBBD', true, 15),
-  ('Uzii Gaang', null, false, 16),
+  ('Uzii Gaang', '7sRct0HMMs3s99sNQPjfEt', false, 16),
   ('Lizz', null, false, 17),
-  ('Nuttyrn', null, false, 18),
-  ('DD Evans', null, false, 19),
+  ('Nuttyrn', '1erwzyuxrmIXxg0jaEVHM0', false, 18),
+  ('DD Evans', '6xu4Aprt1X6CH9YfTyXqJ9', false, 19),
   ('24Gz', null, false, 20),
-  ('Sersy 23', null, false, 21),
+  ('Sersy 23', '5bLlLbAOwo0tOK6zvivHwy', false, 21),
   ('Nito45', null, false, 22),
   ('j13', null, false, 23),
   ('Gusi', null, false, 24),
@@ -102,10 +114,10 @@ insert into public.artists (name, spotify_id, visible, position) values
   ('Yung Represalia', null, false, 32),
   ('Joga', null, false, 33),
   ('Sorroxxe', null, false, 34),
-  ('Musy Lvp', null, false, 35),
-  ('R. Black Mamba', null, false, 36),
-  ('Elmynor', null, false, 37),
-  ('GRETY EL34', null, false, 38),
+  ('Musy Lvp', '2tWdY7GajeHEYYCXh8ZKu8', false, 35),
+  ('R. Black Mamba', '1JDuZvMKGu7ITN6ZKhxsLS', false, 36),
+  ('Elmynor', '0rWyUHIzKtcKdJt0sCx6NN', false, 37),
+  ('GRETY EL34', '4pxfniZ6NW8hKOSkXcOE27', false, 38),
   ('Emedemarco', null, false, 39),
   ('MenorTrvp', null, false, 40),
   ('Traperiimma', null, false, 41),
