@@ -1,6 +1,0 @@
-{
-  "name": "distronow-web",
-  "private": true,
-  "type": "module",
-  "engines": { "node": ">=18" }
-}
