@@ -1,29 +1,6 @@
-// Vercel Serverless Function: GET /api/artistas
-// Devuelve nombre, enlace y foto de cada artista destacado usando el oEmbed
-// público de Spotify (no necesita claves). La respuesta se cachea 24 h en Vercel.
-//
-// Para cambiar la lista, edita ARTISTAS. Si un artista no tiene ID, deja id: ''.
-// Los IDs marcados "verificar" se buscaron a partir de colaboraciones: confirmad
-// que la foto que sale corresponde a ese artista.
-
-const ARTISTAS = [
-  { nombre: 'Qba0gang', id: '2NMRlEX8JsYhetkzAEei4F' },
-  { nombre: 'Pochi', id: '7wbgA4GKIqnYmnUUJbRdrb' },        // verificar
-  { nombre: 'TRAPMALOY', id: '2XDtNhmtCGeQb2JHM6VZH0' },
-  { nombre: 'Kiillyy', id: '6c2BhAXg9skFH774m3SMkl' },      // verificar
-  { nombre: '450DEMON', id: '3pxVZkdzJCb7brlCEr3iip' },
-  { nombre: 'RANDALL13', id: '7ITzhP0voK7pyFGUWNJ39v' },
-  { nombre: 'Soki Beats', id: '' },
-  { nombre: 'AP450', id: '2rF6qcSVrne9xB5SMONqOs' },        // verificar
-  { nombre: 'Lilkovo', id: '5bXe0ibQ6lsPnTyx5pi4mP' },
-  { nombre: 'qymyco', id: '0QNlPXdnS7UtOSC2hyOje5' },       // verificar
-  { nombre: "GRINDIN'", id: '' },
-  { nombre: 'K9OG', id: '' },
-  { nombre: 'BabyMurda', id: '2kz8jl2xrOh8D7hP2VMvQP' },
-  { nombre: 'Mendez 47', id: '2UqlJuqPrNCJPVFa9cOEtg' },
-  { nombre: 'Dylanss0n', id: '0MjDqqTA28UrUZhOiRRour' },
-  { nombre: 'Sav28', id: '40mwZLIT1HDEiJ5YjqvBBD' }
-];
+// GET /api/artistas · artistas visibles con foto de Spotify (oEmbed público, sin claves).
+// La lista se gestiona desde /admin (Supabase). Si Supabase no está configurado, usa la de respaldo.
+import { leerTabla, ARTISTAS_RESPALDO } from './_supabase.js';
 
 async function fotoDe(url) {
   try {
@@ -37,13 +14,20 @@ async function fotoDe(url) {
 }
 
 export default async function handler(req, res) {
+  let lista;
+  try {
+    const filas = await leerTabla('artists');
+    lista = filas ? filas.slice(0, 50).map((f) => ({ nombre: f.name, id: f.spotify_id || '' })) : ARTISTAS_RESPALDO;
+  } catch (e) {
+    lista = ARTISTAS_RESPALDO;
+  }
   const datos = await Promise.all(
-    ARTISTAS.map(async (a) => {
+    lista.map(async (a) => {
       const url = a.id ? 'https://open.spotify.com/artist/' + a.id : '';
-      const foto = url ? await fotoDe(url) : null;
-      return { nombre: a.nombre, id: a.id, url, foto };
+      return { nombre: a.nombre, id: a.id, url, foto: url ? await fotoDe(url) : null };
     })
   );
-  res.setHeader('Cache-Control', 's-maxage=86400, stale-while-revalidate=604800');
+  // Caché corta para que los cambios del panel se vean en pocos minutos
+  res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate=3600');
   res.status(200).json(datos);
 }
