@@ -1,26 +1,25 @@
 # Web DistroNow
 
-Web estática (HTML, CSS y JS) con una función de Vercel para las fotos de artistas.
+## Archivos (todos en la raíz del repositorio)
+- `index.html` · la web (estilos, código y logos van dentro del propio archivo).
+- `admin.html` · panel para gestionar artistas y partners → `/admin`.
+- `aviso-legal.html`, `privacidad.html`, `cookies.html` · páginas legales (BORRADOR: revisar con SFTL y rellenar lo marcado entre [CORCHETES]).
+- `api/` · funciones de Vercel: `artistas` (fotos de Spotify), `partners`, `config`.
+- `supabase/schema.sql` · base de datos del panel (se ejecuta una vez en Supabase).
+- `vercel.json` · URLs limpias (/aviso-legal en vez de /aviso-legal.html).
 
-## Estructura
-- `index.html` — la página.
-- `assets/css/styles.css` — estilos (paleta y tipografías de marca).
-- `assets/js/main.js` — intro, recorrido, artistas, servicios y login.
-- `assets/img/` — logos e iconos.
-- `api/artistas.js` — función serverless: devuelve foto y enlace de Spotify de cada artista (oEmbed público, sin claves, caché 24 h).
+## Puesta en marcha del panel (una sola vez)
+1. Crea un proyecto en supabase.com (plan gratuito) con la cuenta de DistroNow.
+2. Supabase → SQL Editor → New query: pega `supabase/schema.sql`, cambia el email de administrador del apartado 5 y pulsa Run.
+3. Supabase → Authentication → Users → Add user: crea el usuario de cada socio (mismo email que en el paso 2).
+4. Supabase → Authentication → Sign In / Providers: desactiva "Allow new users to sign up".
+5. Supabase → Project Settings → API: copia "Project URL" y la clave "anon public".
+6. Vercel → Settings → Environment Variables: añade `SUPABASE_URL` y `SUPABASE_ANON_KEY` con esos valores y haz Redeploy.
+7. Entra en `https://<tu-web>/admin` con tu email y contraseña.
 
-## Publicar en Vercel
-1. Sube esta carpeta a un repositorio de GitHub de la organización de DistroNow.
-2. En Vercel: Add New → Project → Import ese repositorio.
-3. Framework Preset: **Other**. Sin comando de build. Output directory: la raíz.
-4. Deploy. La web queda en `https://<proyecto>.vercel.app` y la función en `/api/artistas`.
+Sin los pasos 1–6 la web funciona igual con la lista de artistas de respaldo y sin partners.
 
-## Cambios habituales
-- **Artistas:** edita la lista `ARTISTAS` en `api/artistas.js` (y el respaldo `ARTISTS_FALLBACK` en `assets/js/main.js`).
-- **Login:** la URL del iframe del panel está en `LOGIN_URL` en `assets/js/main.js`.
-- **Textos de fases y servicios:** `STAGES` y `SERVICES` en `assets/js/main.js`.
-
-## Pendiente de verificar
-- IDs de Spotify de Pochi, Kiillyy, AP450 y qymyco (comprobar que la foto corresponde).
-- Sin ID: Soki Beats, GRINDIN', K9OG.
-- Que el iframe del panel se deja incrustar desde vuestro dominio.
+## Uso del panel
+- Artistas: añadir con nombre + enlace de Spotify, marcar visible (máx. 50), ordenar con ▲▼, eliminar.
+- Partners: nombre, web y logo (PNG/SVG transparente). Aparecen en "Trabajamos con".
+- Los cambios se ven en la web en unos 5 minutos (caché).

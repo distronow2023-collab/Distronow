@@ -171,6 +171,22 @@ button { font: inherit; }
 .artist__name { margin: 0; font-family: var(--display); font-stretch: 112%; font-weight: 900; font-size: 19px; line-height: 1.1; color: #fff; overflow-wrap: anywhere; }
 .artist__cta { font-size: 13px; font-weight: 600; color: var(--accent-3); }
 
+.artists__hint { margin: 0; font-size: 13px; }
+@media (hover: hover) and (pointer: fine) {
+  .artists__track { overflow-x: hidden; cursor: ew-resize; }
+}
+@media (hover: none) { .artists__hint { display: none; } }
+
+/* Partners */
+.partners { padding-top: 72px; display: flex; flex-direction: column; gap: 28px; }
+.partners[hidden] { display: none; }
+.partners__grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; }
+.partner { min-height: 110px; padding: 20px; border-radius: 14px; border: 1px solid var(--line); background: rgba(255, 255, 255, .03); display: flex; align-items: center; justify-content: center; text-decoration: none; color: var(--muted-2); transition: border-color .25s ease, background .25s ease; }
+.partner:hover { border-color: rgba(120, 200, 255, .5); background: rgba(0, 157, 255, .06); color: #fff; }
+.partner img { max-width: 100%; max-height: 56px; object-fit: contain; filter: grayscale(1) brightness(1.6); opacity: .8; transition: filter .25s ease, opacity .25s ease; }
+.partner:hover img { filter: none; opacity: 1; }
+.partner__name { font-family: var(--display); font-stretch: 112%; font-weight: 800; font-size: 16px; text-align: center; }
+
 /* Services */
 .services { padding-top: 72px; padding-bottom: 56px; display: flex; flex-direction: column; gap: 32px; }
 .services__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); gap: 16px; }
@@ -187,8 +203,17 @@ button { font: inherit; }
 .svc h3 { position: relative; margin: 0; font-family: var(--display); font-stretch: 125%; font-weight: 900; font-size: clamp(24px, 2.8vw, 34px); line-height: 1.05; color: #fff; }
 .svc p { position: relative; margin: 0; max-width: 460px; font-size: 16px; line-height: 1.55; color: var(--text-2); }
 
+/* Cookie notice */
+.cookie { position: fixed; left: 16px; right: 16px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); z-index: 40; max-width: 720px; margin: 0 auto; padding: 14px 16px; border-radius: 14px; border: 1px solid rgba(120, 200, 255, .35); background: #0F1C27; box-shadow: 0 20px 50px rgba(0, 0, 0, .5); display: flex; align-items: center; gap: 16px; font-size: 14px; color: var(--text-2); }
+.cookie[hidden] { display: none; }
+.cookie p { margin: 0; flex: 1; }
+@media (max-width: 560px) { .cookie { flex-direction: column; align-items: stretch; } }
+
 /* Footer */
-.footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; padding-top: 24px; padding-bottom: 40px; border-top: 1px solid rgba(255, 255, 255, .09); font-size: 13px; color: var(--muted); }
+.footer__legal { display: flex; gap: 16px; flex-wrap: wrap; }
+.footer__legal a { color: var(--muted-2); text-decoration: none; }
+.footer__legal a:hover { color: #fff; }
+.footer { align-items: center; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; padding-top: 24px; padding-bottom: 40px; border-top: 1px solid rgba(255, 255, 255, .09); font-size: 13px; color: var(--muted); }
 
 /* Intro */
 .intro { position: fixed; inset: 0; z-index: 50; background: var(--bg); overflow: hidden; }
@@ -301,8 +326,8 @@ button { font: inherit; }
 
       <div class="marquee" aria-hidden="true">
         <div class="marquee__inner">
-          <span>DISTRIBUCIÓN</span><i>→</i><span>PLATAFORMAS</span><i>→</i><span>ROYALTIES</span><i>→</i><span>ANALYTICS</span><i>→</i><span>COBRAR TU DINERO</span><i>·</i>
-          <span>DISTRIBUCIÓN</span><i>→</i><span>PLATAFORMAS</span><i>→</i><span>ROYALTIES</span><i>→</i><span>ANALYTICS</span><i>→</i><span>COBRAR TU DINERO</span><i>·</i>
+          <span>DISTRIBUCIÓN</span><i>→</i><span>PLATAFORMAS</span><i>→</i><span>ROYALTIES</span><i>→</i><span>ANALYTICS</span><i>→</i><span>TU DINERO</span><i>·</i>
+          <span>DISTRIBUCIÓN</span><i>→</i><span>PLATAFORMAS</span><i>→</i><span>ROYALTIES</span><i>→</i><span>ANALYTICS</span><i>→</i><span>TU DINERO</span><i>·</i>
         </div>
       </div>
 
@@ -314,16 +339,17 @@ button { font: inherit; }
               <h2 id="artists-title">Artistas con los que trabajamos</h2>
             </div>
           </div>
-          <div class="artists__arrows">
-            <button type="button" class="icon-btn" id="artistsPrev" aria-label="Artistas anteriores">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
-            </button>
-            <button type="button" class="icon-btn icon-btn--accent" id="artistsNext" aria-label="Más artistas">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
-            </button>
-          </div>
+          <p class="muted artists__hint">Pasa el ratón por los artistas para recorrerlos</p>
         </div>
         <div class="artists__track" id="artistsTrack"></div>
+      </section>
+
+      <section class="wrap partners" id="partnersSection" aria-labelledby="partners-title" hidden>
+        <div class="section-title">
+          <span class="section-title__bar"></span>
+          <h2 id="partners-title">Trabajamos con</h2>
+        </div>
+        <div class="partners__grid" id="partnersGrid"></div>
       </section>
 
       <section class="wrap services" aria-labelledby="services-title">
@@ -340,8 +366,18 @@ button { font: inherit; }
 
     <footer class="wrap footer">
       <span>© DistroNow · Tu equipo, tu solución.</span>
+      <nav class="footer__legal" aria-label="Legal">
+        <a href="/aviso-legal">Aviso legal</a>
+        <a href="/privacidad">Privacidad</a>
+        <a href="/cookies">Cookies</a>
+      </nav>
       <a href="mailto:info@distronow.com" class="mono">info@distronow.com</a>
     </footer>
+  </div>
+
+  <div class="cookie" id="cookieNotice" role="region" aria-label="Aviso de cookies" hidden>
+    <p>Esta web solo usa almacenamiento técnico necesario para funcionar. No usamos cookies de publicidad ni de analítica. <a href="/cookies">Más información</a></p>
+    <button type="button" class="btn btn--soft btn--sm" id="cookieOk">Entendido</button>
   </div>
 
   <!-- LOGIN -->
@@ -377,7 +413,7 @@ button { font: inherit; }
     { num: '02', name: 'Plataformas', short: 'PLATAFORMAS', big: 'PLATAFORMAS', text: 'Tu música disponible en las principales tiendas y plataformas digitales del mundo.' },
     { num: '03', name: 'Royalties', short: 'ROYALTIES', big: 'ROYALTIES', text: 'Cada reproducción genera ingresos. Te los reportamos cada mes de forma clara, tema a tema.' },
     { num: '04', name: 'Analytics', short: 'ANALYTICS', big: 'ANALYTICS', text: 'Datos de escucha por plataforma, país y tema para tomar decisiones con información, no a ciegas.' },
-    { num: '05', name: 'Cobrar tu dinero', short: 'COBRAR', big: 'COBRAR TU DINERO', text: 'Lo que generan tus temas llega a tu cuenta, con el detalle de cada pago y sin letra pequeña.' }
+    { num: '05', name: 'Tu dinero', short: 'TU DINERO', big: 'TU DINERO', text: 'Recibe en tu cuenta lo que generan tus temas, con el detalle de cada pago.' }
   ];
 
   var SERVICES = [
@@ -390,11 +426,21 @@ button { font: inherit; }
   // Respaldo si /api/artistas no responde (por ejemplo, abriendo el HTML en local).
   // La lista "oficial" vive en /api/artistas.js.
   var ARTISTS_FALLBACK = [
-    ['Qba0gang', '2NMRlEX8JsYhetkzAEei4F'], ['Pochi', '7wbgA4GKIqnYmnUUJbRdrb'], ['TRAPMALOY', '2XDtNhmtCGeQb2JHM6VZH0'],
-    ['Kiillyy', '6c2BhAXg9skFH774m3SMkl'], ['450DEMON', '3pxVZkdzJCb7brlCEr3iip'], ['RANDALL13', '7ITzhP0voK7pyFGUWNJ39v'],
-    ['Soki Beats', ''], ['AP450', '2rF6qcSVrne9xB5SMONqOs'], ['Lilkovo', '5bXe0ibQ6lsPnTyx5pi4mP'], ['qymyco', '0QNlPXdnS7UtOSC2hyOje5'],
-    ["GRINDIN'", ''], ['K9OG', ''], ['BabyMurda', '2kz8jl2xrOh8D7hP2VMvQP'], ['Mendez 47', '2UqlJuqPrNCJPVFa9cOEtg'],
-    ['Dylanss0n', '0MjDqqTA28UrUZhOiRRour'], ['Sav28', '40mwZLIT1HDEiJ5YjqvBBD']
+    ['Qba0gang', '2NMRlEX8JsYhetkzAEei4F'],
+    ['Pochi', '7wbgA4GKIqnYmnUUJbRdrb'],
+    ['TRAPMALOY', '2XDtNhmtCGeQb2JHM6VZH0'],
+    ['Kiillyy', '6c2BhAXg9skFH774m3SMkl'],
+    ['450DEMON', '3pxVZkdzJCb7brlCEr3iip'],
+    ['RANDALL13', '7ITzhP0voK7pyFGUWNJ39v'],
+    ['Soki Beats', '3HOFsPM3TlhWUQUqNM0An2'],
+    ['AP450', '2rF6qcSVrne9xB5SMONqOs'],
+    ['Lilkovo', '5bXe0ibQ6lsPnTyx5pi4mP'],
+    ['qymyco', '0QNlPXdnS7UtOSC2hyOje5'],
+    ['K9OG', '3ZuhUNDs6lQ3ifEwAQ22z5'],
+    ['BabyMurda', '2kz8jl2xrOh8D7hP2VMvQP'],
+    ['Mendez 47', '2UqlJuqPrNCJPVFa9cOEtg'],
+    ['Dylanss0n', '0MjDqqTA28UrUZhOiRRour'],
+    ['Sav28', '40mwZLIT1HDEiJ5YjqvBBD']
   ].map(function (a) {
     return { nombre: a[0], id: a[1], url: a[1] ? 'https://open.spotify.com/artist/' + a[1] : '', foto: null };
   });
@@ -590,9 +636,53 @@ button { font: inherit; }
       .catch(function () { /* se queda el respaldo con iniciales */ });
 
     var tr = $('#artistsTrack');
-    function scroll(dir) { tr.scrollBy({ left: dir * Math.max(252, tr.clientWidth * 0.8), behavior: reduceMotion ? 'auto' : 'smooth' }); }
-    $('#artistsPrev').addEventListener('click', function () { scroll(-1); });
-    $('#artistsNext').addEventListener('click', function () { scroll(1); });
+    var fine = window.matchMedia && window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+    if (!fine) return;
+    var target = 0, raf = null;
+    function step() {
+      var cur = tr.scrollLeft;
+      var next = reduceMotion ? target : cur + (target - cur) * 0.12;
+      tr.scrollLeft = next;
+      raf = Math.abs(target - next) > 0.5 ? requestAnimationFrame(step) : null;
+    }
+    tr.addEventListener('mousemove', function (e) {
+      var r = tr.getBoundingClientRect();
+      var margin = 0.12; // zonas muertas en los bordes para llegar al principio y al final
+      var x = (e.clientX - r.left) / r.width;
+      var t = Math.max(0, Math.min(1, (x - margin) / (1 - 2 * margin)));
+      target = t * (tr.scrollWidth - tr.clientWidth);
+      if (!raf) raf = requestAnimationFrame(step);
+    });
+  }
+
+  /* ---------- Partners ---------- */
+  function initPartners() {
+    fetch('/api/partners')
+      .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+      .then(function (list) {
+        if (!Array.isArray(list) || !list.length) return;
+        $('#partnersGrid').innerHTML = list.map(function (p) {
+          var inner = p.logo ? '<img src="' + esc(p.logo) + '" alt="' + esc(p.nombre) + '" loading="lazy">' : '<span class="partner__name">' + esc(p.nombre) + '</span>';
+          return p.web
+            ? '<a class="partner" href="' + esc(p.web) + '" target="_blank" rel="noopener" title="' + esc(p.nombre) + '">' + inner + '</a>'
+            : '<div class="partner" title="' + esc(p.nombre) + '">' + inner + '</div>';
+        }).join('');
+        $('#partnersSection').hidden = false;
+      })
+      .catch(function () { /* sin partners: la sección queda oculta */ });
+  }
+
+  /* ---------- Aviso de cookies ---------- */
+  function initCookie() {
+    var box = $('#cookieNotice');
+    var ok = false;
+    try { ok = localStorage.getItem('dn-cookie-ok') === '1'; } catch (e) { /* ignorar */ }
+    if (ok) return;
+    box.hidden = false;
+    $('#cookieOk').addEventListener('click', function () {
+      try { localStorage.setItem('dn-cookie-ok', '1'); } catch (e) { /* ignorar */ }
+      box.hidden = true;
+    });
   }
 
   /* ---------- Servicios ---------- */
@@ -672,6 +762,8 @@ button { font: inherit; }
   document.addEventListener('DOMContentLoaded', function () {
     var journey = initJourney();
     initArtists();
+    initPartners();
+    initCookie();
     initServices();
     initLogin();
     initPointer();
