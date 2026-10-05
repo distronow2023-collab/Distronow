@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>DistroNow · Distribución digital, royalties y analytics</title>
+  <meta name="description" content="Distribución digital, royalties claros y datos para hacer crecer tu música. Tu equipo, tu solución.">
+  <meta name="theme-color" content="#050B10">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/img/favicon-32.png">
+  <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
+  <meta property="og:title" content="DistroNow">
+  <meta property="og:description" content="Distribución digital, royalties claros y datos para hacer crecer tu música.">
+  <meta property="og:image" content="assets/img/dn-icon.jpg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100,700;125,800;125,900&family=Hanken+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600;700&display=swap">
+  <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
+  <div class="glow" aria-hidden="true"></div>
+
+  <!-- INTRO -->
+  <div class="intro" id="intro" aria-label="Introducción">
+    <div class="intro__stage" id="introStage"></div>
+    <div class="intro__segs" aria-hidden="true">
+      <span></span><span></span><span></span><span></span><span></span>
+    </div>
+    <button type="button" class="intro__skip" id="skipIntro">Saltar intro</button>
+  </div>
+
+  <div class="page" id="page">
+    <header class="wrap nav">
+      <a href="/" class="brand" aria-label="DistroNow, inicio">
+        <span class="brand__badge"><img src="assets/img/dn-mark-white.png" alt=""></span>
+        <span class="brand__name">DISTRONOW</span>
+      </a>
+      <nav class="nav__actions">
+        <a href="mailto:info@distronow.com" class="nav__link">Contacto</a>
+        <button type="button" class="btn btn--ghost btn--sm" data-open-login>Acceso artistas</button>
+      </nav>
+    </header>
+
+    <main>
+      <section class="wrap hero">
+        <img class="hero__mark" id="heroMark" src="assets/img/dn-mark-blue.png" alt="">
+        <p class="hero__kicker">DISTRIBUCIÓN · ROYALTIES · ANALYTICS</p>
+        <h1 class="hero__title">DISTRONOW</h1>
+        <p class="hero__sub">Distribución digital, royalties claros y datos para hacer crecer tu música. Tu equipo, tu solución.</p>
+        <div class="hero__ctas">
+          <button type="button" class="btn btn--primary" data-open-login>Entrar al panel →</button>
+          <a href="mailto:info@distronow.com" class="btn btn--ghost">Contacto</a>
+        </div>
+      </section>
+
+      <section class="wrap" aria-labelledby="recorrido-title">
+        <div class="journey">
+          <div class="journey__head">
+            <div class="section-title">
+              <span class="section-title__bar"></span>
+              <h2 id="recorrido-title">El recorrido de tu música</h2>
+            </div>
+            <div class="journey__controls">
+              <span class="mono muted" id="stageCounter">01 / 05</span>
+              <button type="button" class="btn btn--soft btn--sm" id="playJourney">▶ Ver el recorrido</button>
+            </div>
+          </div>
+          <div class="journey__panel" id="journeyPanel" aria-live="polite"></div>
+          <div class="journey__track" id="journeyTrack" role="slider" tabindex="0" aria-label="Fase del recorrido" aria-valuemin="1" aria-valuemax="5" aria-valuenow="1">
+            <div class="journey__line"></div>
+            <div class="journey__fill" id="journeyFill"></div>
+            <div class="journey__head-dot" id="journeyDot"></div>
+            <div id="journeyNodes"></div>
+          </div>
+        </div>
+      </section>
+
+      <div class="marquee" aria-hidden="true">
+        <div class="marquee__inner">
+          <span>DISTRIBUCIÓN</span><i>→</i><span>PLATAFORMAS</span><i>→</i><span>ROYALTIES</span><i>→</i><span>ANALYTICS</span><i>→</i><span>COBRAR TU DINERO</span><i>·</i>
+          <span>DISTRIBUCIÓN</span><i>→</i><span>PLATAFORMAS</span><i>→</i><span>ROYALTIES</span><i>→</i><span>ANALYTICS</span><i>→</i><span>COBRAR TU DINERO</span><i>·</i>
+        </div>
+      </div>
+
+      <section class="wrap artists" aria-labelledby="artists-title">
+        <div class="artists__head">
+          <div>
+            <div class="section-title">
+              <span class="section-title__bar"></span>
+              <h2 id="artists-title">Artistas con los que trabajamos</h2>
+            </div>
+          </div>
+          <div class="artists__arrows">
+            <button type="button" class="icon-btn" id="artistsPrev" aria-label="Artistas anteriores">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+            </button>
+            <button type="button" class="icon-btn icon-btn--accent" id="artistsNext" aria-label="Más artistas">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="artists__track" id="artistsTrack"></div>
+      </section>
+
+      <section class="wrap services" aria-labelledby="services-title">
+        <div class="section-title">
+          <span class="section-title__bar"></span>
+          <h2 id="services-title">Nuestros servicios</h2>
+        </div>
+        <div class="services__grid">
+          <div class="services__tabs" id="servicesTabs" role="tablist"></div>
+          <div class="services__panel" id="servicesPanel" role="tabpanel"></div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="wrap footer">
+      <span>© DistroNow · Tu equipo, tu solución.</span>
+      <a href="mailto:info@distronow.com" class="mono">info@distronow.com</a>
+    </footer>
+  </div>
+
+  <!-- LOGIN -->
+  <div class="modal" id="loginModal" hidden>
+    <div class="modal__card" role="dialog" aria-modal="true" aria-labelledby="login-title">
+      <button type="button" class="modal__close" data-close-login aria-label="Cerrar">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+      <div class="modal__brand">
+        <span class="brand__badge brand__badge--sm"><img src="assets/img/dn-mark-white.png" alt=""></span>
+        <span class="mono accent-text">PANEL DE ARTISTAS</span>
+      </div>
+      <h2 id="login-title" class="modal__title">Accede a tu cuenta</h2>
+      <div class="modal__frame">
+        <!-- El iframe se carga al abrir el modal (ver main.js) -->
+      </div>
+      <div class="modal__links">
+        <span class="muted">Acceso seguro al panel</span>
+        <a href="mailto:info@distronow.com">Quiero distribuir con DistroNow</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/js/main.js" defer></script>
+</body>
+</html>
