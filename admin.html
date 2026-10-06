@@ -97,13 +97,88 @@ main{padding:28px 0 60px}
     <section id="app" hidden>
       <p class="err" id="notAdmin" hidden>Tu usuario no tiene permiso para editar. Pide a un socio que añada tu email a la tabla de administradores.</p>
       <div class="tabs" role="tablist">
-        <button class="tab" role="tab" aria-selected="true" data-tab="artists">Artistas</button>
+        <button class="tab" role="tab" aria-selected="true" data-tab="applications">Solicitudes <span id="appBadge"></span></button>
+        <button class="tab" role="tab" aria-selected="false" data-tab="messages">Mensajes <span id="msgBadge"></span></button>
+        <button class="tab" role="tab" aria-selected="false" data-tab="artists">Artistas</button>
+        <button class="tab" role="tab" aria-selected="false" data-tab="labels">Sellos</button>
+        <button class="tab" role="tab" aria-selected="false" data-tab="takedowns">Retiradas <span id="tdBadge"></span></button>
+        <button class="tab" role="tab" aria-selected="false" data-tab="data">Datos</button>
         <button class="tab" role="tab" aria-selected="false" data-tab="partners">Partners</button>
         <button class="tab" role="tab" aria-selected="false" data-tab="settings">Ajustes</button>
       </div>
 
       <!-- Artistas -->
-      <div id="tab-artists" class="card">
+      <!-- Solicitudes -->
+      <div id="tab-applications" class="card">
+        <div class="meta" style="margin-top:0">
+          <span class="count" id="appCount"></span>
+          <label class="switch" style="flex-direction:row">Ver
+            <select id="appFilter" style="min-height:34px;border-radius:8px;background:#050B10;color:#fff;border:1px solid var(--line);padding:0 8px">
+              <option value="activas">nuevas y en revisión</option><option value="nueva">nuevas</option><option value="en revisión">en revisión</option>
+              <option value="aceptada">aceptadas</option><option value="descartada">descartadas</option><option value="todas">todas</option>
+            </select></label>
+        </div>
+        <div class="list" id="appList"></div>
+      </div>
+
+      <!-- Mensajes -->
+      <div id="tab-messages" class="card" hidden>
+        <div class="meta" style="margin-top:0"><span class="count" id="msgCount"></span>
+          <label class="switch" style="flex-direction:row"><input type="checkbox" id="msgUnread" checked> Solo sin leer</label></div>
+        <div class="list" id="msgList"></div>
+      </div>
+
+<!-- Sellos -->
+      <div id="tab-labels" class="card" hidden>
+        <p class="help">Cada sello ve en <a href="/sellos" target="_blank">/sellos</a> solo las cuentas que le asignes aquí. Las personas del sello entran con su email (les llega un enlace, sin contraseña).</p>
+        <form class="toolbar" id="labelForm">
+          <label>Nombre del sello<input type="text" id="lName" required placeholder="Ej.: LAWLESS"></label>
+          <button class="btn btn--primary" type="submit">Crear sello</button>
+        </form>
+        <div class="list" id="labelList"></div>
+      </div>
+
+      <!-- Retiradas -->
+      <div id="tab-takedowns" class="card" hidden>
+        <div class="meta" style="margin-top:0"><span class="count" id="tdCount"></span>
+          <label class="switch" style="flex-direction:row"><input type="checkbox" id="tdPending" checked> Solo pendientes</label></div>
+        <p class="help">Retira las pistas en el panel de distribución y marca aquí la solicitud como hecha. El sello verá el estado y tu respuesta.</p>
+        <div class="list" id="tdList"></div>
+      </div>
+
+      <!-- Datos -->
+      <div id="tab-data" class="card" hidden>
+        <p class="help">Sube cada mes (día 15, con el statement nuevo) los exports del panel. Acepta Excel (.xlsx) o CSV. Si subes un periodo que ya existe, se reemplaza.</p>
+        <div style="display:grid;gap:16px">
+          <div class="card" style="background:var(--panel2)">
+            <b>1. Rendimiento por pista</b> <span class="sub">Export GYRO "Track Level" (ISRC, Email, Status, Track Artist, TSF, Commission, Gross)</span>
+            <div class="toolbar" style="margin:10px 0 0">
+              <label>Mes del statement<input type="month" id="dTrackPeriod" style="min-height:40px;border-radius:10px;border:1px solid rgba(255,255,255,.18);background:rgba(5,11,16,.7);color:#fff;padding:0 10px"></label>
+              <label>Archivo<input type="file" id="dTrackFile" accept=".xlsx,.xls,.csv"></label>
+              <button class="btn btn--primary" id="dTrackGo">Importar</button>
+            </div>
+          </div>
+          <div class="card" style="background:var(--panel2)">
+            <b>2. Rendimiento por cuenta</b> <span class="sub">Export GYRO "Account Level" (email, Releases, Track, Streams, Gross, TSF, Post TSF)</span>
+            <div class="toolbar" style="margin:10px 0 0">
+              <label>Mes del statement<input type="month" id="dAccPeriod" style="min-height:40px;border-radius:10px;border:1px solid rgba(255,255,255,.18);background:rgba(5,11,16,.7);color:#fff;padding:0 10px"></label>
+              <label>Archivo<input type="file" id="dAccFile" accept=".xlsx,.xls,.csv"></label>
+              <button class="btn btn--primary" id="dAccGo">Importar</button>
+            </div>
+          </div>
+          <div class="card" style="background:var(--panel2)">
+            <b>3. Catálogo</b> <span class="sub">Export "track-level" del catálogo (Track ISRC, Track Name, Release Title, Release Date, Main Artist, Record Label). Sirve para mostrar títulos.</span>
+            <div class="toolbar" style="margin:10px 0 0">
+              <label>Archivo<input type="file" id="dMetaFile" accept=".xlsx,.xls,.csv"></label>
+              <button class="btn btn--primary" id="dMetaGo">Importar</button>
+            </div>
+          </div>
+          <p class="sub" id="dStatus" role="status"></p>
+          <div><b>Periodos cargados</b><div class="list" id="dPeriods" style="margin-top:8px"></div></div>
+        </div>
+      </div>
+
+      <div id="tab-artists" class="card" hidden>
         <p class="help">Comprueba con la foto que el enlace es del artista correcto. Pega el enlace del perfil de Spotify (Spotify → perfil del artista → ⋯ → Compartir → Copiar enlace). Solo se muestran en la web los artistas marcados como visibles, en este orden, hasta 50.</p>
         <form class="toolbar" id="artistForm">
           <label>Nombre<input type="text" id="aName" required placeholder="Nombre del artista"></label>
@@ -138,6 +213,15 @@ main{padding:28px 0 60px}
           <span style="font-size:13px;color:var(--muted)">Rápido</span>
           <output id="speedOut" style="font-family:'IBM Plex Mono',monospace;font-weight:600;min-width:28px;text-align:center">3</output>
         </div>
+        <h2 style="margin:28px 0 6px;font-family:'Archivo',sans-serif;font-stretch:112%;font-weight:800;font-size:18px">Solicitudes de distribución</h2>
+        <label class="switch" style="flex-direction:row"><input type="checkbox" id="appsOpen"> Aceptar nuevas solicitudes en la web</label>
+        <p class="help" style="margin-top:6px">Si lo desactivas, el formulario se sustituye por un aviso de "solicitudes cerradas" y el botón de la portada lleva a Contacto.</p>
+        <h2 style="margin:22px 0 6px;font-family:'Archivo',sans-serif;font-stretch:112%;font-weight:800;font-size:18px">Login del panel</h2>
+        <label class="switch" style="flex-direction:row"><input type="checkbox" id="loginDark"> Mostrar el login en modo oscuro</label>
+        <p class="help" style="margin-top:6px">Oscurece el formulario del proveedor con un filtro. Revísalo en la web después de activarlo: puede alterar logos o colores del formulario.</p>
+        <h2 style="margin:22px 0 6px;font-family:'Archivo',sans-serif;font-stretch:112%;font-weight:800;font-size:18px">Herramienta de track fee (sellos)</h2>
+        <label style="max-width:320px">Umbral de royalties por pista (AUD al mes)<input type="number" id="tsfThreshold" min="0" step="0.01" value="1.00"></label>
+        <p class="help" style="margin-top:6px">Las pistas que generan menos de esta cifra de media aparecen en el filtro "Por debajo del umbral" del back-office de sellos. La política interna es retirar las que generan menos de 0,60 € al mes: convierte esa cifra a AUD con el tipo de cambio actual.</p>
         <div style="margin-top:18px"><button class="btn btn--primary" id="saveSettings">Guardar ajustes</button></div>
         <p class="help" style="margin-top:12px">Los cambios se ven en la web en un minuto aproximadamente.</p>
       </div>
@@ -192,13 +276,14 @@ main{padding:28px 0 60px}
   function enter() {
     $('#loginForm').hidden = true; $('#app').hidden = false; $('#hdrActions').hidden = false;
     sb.from('admins').select('email').then(function (r) { $('#notAdmin').hidden = !!(r.data && r.data.length); });
-    loadArtists(); loadPartners(); loadSettings();
+    loadApplications(); loadMessages(); loadArtists(); loadPartners(); loadSettings(); loadLabels(); loadTakedowns();
   }
 
   document.querySelectorAll('[data-tab]').forEach(function (b) {
     b.addEventListener('click', function () {
       document.querySelectorAll('[data-tab]').forEach(function (x) { x.setAttribute('aria-selected', x === b); });
-      $('#tab-artists').hidden = b.dataset.tab !== 'artists';
+      ['applications', 'messages', 'artists', 'labels', 'takedowns', 'data'].forEach(function (t) { $('#tab-' + t).hidden = b.dataset.tab !== t; });
+      if (b.dataset.tab === 'data') loadPeriods();
       $('#tab-partners').hidden = b.dataset.tab !== 'partners';
       $('#tab-settings').hidden = b.dataset.tab !== 'settings';
     });
@@ -290,18 +375,325 @@ main{padding:28px 0 60px}
     });
   });
 
+  /* ---------- Solicitudes ---------- */
+  var apps = [], msgs = [];
+  var STATUS = ['nueva', 'en revisión', 'aceptada', 'descartada'];
+  function fmtDate(d) { try { return new Date(d).toLocaleString('es-ES', { dateStyle: 'medium', timeStyle: 'short' }); } catch (e) { return d; } }
+  function link(u, label) { return u ? '<a href="' + esc(u) + '" target="_blank" rel="noopener">' + label + ' ↗</a>' : '<span style="color:var(--muted)">' + label + ': —</span>'; }
+  function loadApplications() {
+    sb.from('applications').select('*').order('created_at', { ascending: false }).then(function (r) {
+      if (r.error) { $('#appList').innerHTML = '<div class="empty">Falta crear la tabla de solicitudes: ejecuta supabase/v3-formularios.sql.</div>'; return; }
+      apps = r.data; renderApplications();
+    });
+  }
+  function renderApplications() {
+    var f = $('#appFilter').value;
+    var nuevas = apps.filter(function (a) { return a.status === 'nueva'; }).length;
+    $('#appBadge').textContent = nuevas ? '(' + nuevas + ')' : '';
+    $('#appCount').innerHTML = '<b>' + nuevas + '</b> nuevas · ' + apps.length + ' en total';
+    var list = apps.filter(function (a) { return f === 'todas' || (f === 'activas' ? (a.status === 'nueva' || a.status === 'en revisión') : a.status === f); });
+    $('#appList').innerHTML = list.map(function (a) {
+      var i = apps.indexOf(a);
+      return '<details class="card" style="padding:14px 16px;background:var(--panel2)" data-i="' + i + '"' + (a.status === 'nueva' ? ' open' : '') + '>' +
+        '<summary style="cursor:pointer;display:flex;gap:12px;align-items:center;flex-wrap:wrap;list-style:none">' +
+        '<b style="font-family:Archivo,sans-serif;font-stretch:112%;font-size:16px">' + esc(a.artist_name) + '</b>' +
+        '<span class="tag ' + (a.status === 'nueva' ? 'tag--warn' : (a.status === 'aceptada' ? 'tag--ok' : '')) + '" style="border:1px solid var(--line)">' + esc(a.status) + '</span>' +
+        '<span style="color:var(--muted);font-size:13px">' + fmtDate(a.created_at) + ' · ' + (a.listeners || 0).toLocaleString('es-ES') + ' oyentes · ' + (a.tracks || 0) + ' tracks</span></summary>' +
+        '<div style="display:grid;gap:10px;margin-top:12px;font-size:14px">' +
+        '<div>' + esc(a.name) + ' · <a href="mailto:' + esc(a.email) + '?subject=' + encodeURIComponent('Tu solicitud en DistroNow') + '">' + esc(a.email) + '</a></div>' +
+        '<div style="display:flex;gap:14px;flex-wrap:wrap">' + link(a.spotify, 'Spotify') + link(a.instagram, 'Instagram') + link(a.youtube, 'YouTube') + '</div>' +
+        '<div style="white-space:pre-wrap;color:var(--text2);background:rgba(255,255,255,.04);padding:10px 12px;border-radius:8px">' + esc(a.motivation) + '</div>' +
+        '<div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">Estado: <select data-field="status" style="min-height:34px;border-radius:8px;background:#050B10;color:#fff;border:1px solid var(--line);padding:0 8px">' +
+        STATUS.map(function (st) { return '<option' + (st === a.status ? ' selected' : '') + '>' + st + '</option>'; }).join('') + '</select>' +
+        '<button class="btn btn--danger btn--sm" data-act="del">Eliminar</button></div>' +
+        '<label>Notas internas<input type="text" data-field="notes" value="' + esc(a.notes || '') + '" placeholder="Solo las ve el equipo"></label>' +
+        '</div></details>';
+    }).join('') || '<div class="empty">No hay solicitudes en esta vista.</div>';
+  }
+  $('#appFilter').addEventListener('change', renderApplications);
+  $('#appList').addEventListener('change', function (e) {
+    var f = e.target.dataset.field; if (!f) return;
+    var a = apps[Number(e.target.closest('[data-i]').dataset.i)]; var patch = {}; patch[f] = e.target.value;
+    sb.from('applications').update(patch).eq('id', a.id).then(function (r) { if (r.error) return fail(r.error); Object.assign(a, patch); if (f === 'status') renderApplications(); toast('Guardado'); });
+  });
+  $('#appList').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-act="del"]'); if (!b) return;
+    var a = apps[Number(b.closest('[data-i]').dataset.i)];
+    if (confirm('¿Eliminar la solicitud de ' + a.artist_name + '?')) sb.from('applications').delete().eq('id', a.id).then(function (r) { if (r.error) return fail(r.error); toast('Solicitud eliminada'); loadApplications(); });
+  });
+
+  /* ---------- Mensajes ---------- */
+  function loadMessages() {
+    sb.from('messages').select('*').order('created_at', { ascending: false }).then(function (r) {
+      if (r.error) { $('#msgList').innerHTML = '<div class="empty">Falta crear la tabla de mensajes: ejecuta supabase/v3-formularios.sql.</div>'; return; }
+      msgs = r.data; renderMessages();
+    });
+  }
+  function renderMessages() {
+    var unread = msgs.filter(function (m) { return !m.read; }).length;
+    $('#msgBadge').textContent = unread ? '(' + unread + ')' : '';
+    $('#msgCount').innerHTML = '<b>' + unread + '</b> sin leer · ' + msgs.length + ' en total';
+    var only = $('#msgUnread').checked;
+    $('#msgList').innerHTML = msgs.filter(function (m) { return !only || !m.read; }).map(function (m) {
+      var i = msgs.indexOf(m);
+      return '<div class="card" style="padding:14px 16px;background:var(--panel2);display:grid;gap:8px;font-size:14px" data-i="' + i + '">' +
+        '<div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center"><b>' + esc(m.subject || '(sin asunto)') + '</b><span style="color:var(--muted);font-size:13px">' + esc(m.name) + ' · ' + fmtDate(m.created_at) + '</span></div>' +
+        '<div style="white-space:pre-wrap;color:var(--text2)">' + esc(m.message) + '</div>' +
+        '<div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center"><a class="btn btn--sm" style="display:inline-flex;align-items:center;text-decoration:none" href="mailto:' + esc(m.email) + '?subject=' + encodeURIComponent('Re: ' + (m.subject || 'Tu mensaje a DistroNow')) + '">Responder</a>' +
+        '<label class="switch"><input type="checkbox" data-field="read"' + (m.read ? ' checked' : '') + '> Leído</label>' +
+        '<button class="btn btn--danger btn--sm" data-act="del">Eliminar</button></div></div>';
+    }).join('') || '<div class="empty">No hay mensajes en esta vista.</div>';
+  }
+  $('#msgUnread').addEventListener('change', renderMessages);
+  $('#msgList').addEventListener('change', function (e) {
+    if (e.target.dataset.field !== 'read') return;
+    var m = msgs[Number(e.target.closest('[data-i]').dataset.i)];
+    sb.from('messages').update({ read: e.target.checked }).eq('id', m.id).then(function (r) { if (r.error) return fail(r.error); m.read = e.target.checked; renderMessages(); });
+  });
+  $('#msgList').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-act="del"]'); if (!b) return;
+    var m = msgs[Number(b.closest('[data-i]').dataset.i)];
+    if (confirm('¿Eliminar este mensaje?')) sb.from('messages').delete().eq('id', m.id).then(function (r) { if (r.error) return fail(r.error); toast('Mensaje eliminado'); loadMessages(); });
+  });
+
+  /* ---------- Sellos ---------- */
+  var labels = [];
+  function loadLabels() {
+    Promise.all([
+      sb.from('labels').select('*').order('name'),
+      sb.from('label_accounts').select('*'),
+      sb.from('label_members').select('*')
+    ]).then(function (rs) {
+      if (rs[0].error) { $('#labelList').innerHTML = '<div class="empty">Falta crear las tablas de sellos: ejecuta supabase/v4-sellos.sql.</div>'; return; }
+      labels = rs[0].data.map(function (l) {
+        l.accounts = (rs[1].data || []).filter(function (a) { return a.label_id === l.id; }).map(function (a) { return a.email; });
+        l.members = (rs[2].data || []).filter(function (m) { return m.label_id === l.id; }).map(function (m) { return m.email; });
+        return l;
+      });
+      renderLabels();
+    });
+  }
+  function renderLabels() {
+    $('#labelList').innerHTML = labels.map(function (l, i) {
+      return '<details class="card" style="padding:14px 16px;background:var(--panel2)" data-i="' + i + '">' +
+        '<summary style="cursor:pointer;display:flex;gap:12px;align-items:center;flex-wrap:wrap;list-style:none">' +
+        '<span class="thumb" style="width:44px;height:44px">' + (l.logo_url ? '<img src="' + esc(l.logo_url) + '" alt="">' : esc(initials(l.name))) + '</span>' +
+        '<b style="font-family:Archivo,sans-serif;font-stretch:112%;font-size:16px">' + esc(l.name) + '</b>' +
+        '<span class="sub">' + l.accounts.length + ' cuentas · ' + l.members.length + ' personas con acceso</span></summary>' +
+        '<div style="display:grid;gap:14px;margin-top:14px">' +
+        '<label>Nombre<input type="text" data-field="name" value="' + esc(l.name) + '"></label>' +
+        '<label>Cuentas del panel (un email por línea)<textarea data-field="accounts" rows="5" style="min-height:110px;padding:10px 12px;border-radius:10px;border:1px solid rgba(255,255,255,.18);background:rgba(5,11,16,.7);color:#fff;font:inherit">' + esc(l.accounts.join('\n')) + '</textarea></label>' +
+        '<div><button class="btn btn--sm" data-act="saveAcc">Guardar cuentas</button></div>' +
+        '<div><b style="font-size:13px;color:var(--muted)">Personas con acceso al back-office</b><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">' +
+        (l.members.map(function (m) { return '<span class="tag" style="border:1px solid var(--line);display:inline-flex;gap:6px;align-items:center;padding:4px 10px">' + esc(m) + ' <button class="btn btn--sm" style="min-height:22px;padding:0 6px" data-act="delMember" data-email="' + esc(m) + '" aria-label="Quitar">×</button></span>'; }).join('') || '<span class="sub">Nadie todavía.</span>') +
+        '</div><div class="toolbar" style="margin:10px 0 0"><label>Email<input type="email" data-field="newMember" placeholder="aandr@sello.com"></label><button class="btn btn--primary btn--sm" data-act="addMember">Dar acceso e invitar</button></div></div>' +
+        '<label>Notas internas (condiciones, cuota…)<input type="text" data-field="notes" value="' + esc(l.notes || '') + '" placeholder="Solo las ve el admin"></label>' +
+        '<div style="display:flex;gap:10px;flex-wrap:wrap"><label class="btn btn--sm" style="display:inline-flex;align-items:center;flex-direction:row;color:#fff">Cambiar logo<input type="file" data-field="logo" accept="image/*" hidden></label>' +
+        '<button class="btn btn--danger btn--sm" data-act="delLabel">Eliminar sello</button></div>' +
+        '</div></details>';
+    }).join('') || '<div class="empty">Aún no hay sellos. Crea el primero arriba.</div>';
+  }
+  $('#labelForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var name = $('#lName').value.trim(); if (!name) return;
+    sb.from('labels').insert({ name: name }).then(function (r) { if (r.error) return fail(r.error); $('#labelForm').reset(); toast('Sello creado'); loadLabels(); });
+  });
+  $('#labelList').addEventListener('change', function (e) {
+    var f = e.target.dataset.field; if (!f || f === 'accounts' || f === 'newMember') return;
+    var l = labels[Number(e.target.closest('[data-i]').dataset.i)];
+    if (f === 'name' && e.target.value.trim()) sb.from('labels').update({ name: e.target.value.trim() }).eq('id', l.id).then(function (r) { if (r.error) return fail(r.error); l.name = e.target.value.trim(); toast('Guardado'); });
+    if (f === 'notes') sb.from('labels').update({ notes: e.target.value.trim() || null }).eq('id', l.id).then(function (r) { if (r.error) return fail(r.error); toast('Guardado'); });
+    if (f === 'logo' && e.target.files[0]) {
+      var file = e.target.files[0], ext = (file.name.split('.').pop() || 'png').toLowerCase().replace(/[^a-z0-9]/g, '');
+      var path = l.id + '/logo-' + Date.now() + '.' + ext;
+      sb.storage.from('labels').upload(path, file, { cacheControl: '31536000' }).then(function (r) {
+        if (r.error) return fail(r.error);
+        var url = sb.storage.from('labels').getPublicUrl(path).data.publicUrl;
+        return sb.from('labels').update({ logo_url: url }).eq('id', l.id).then(function (u) { if (u.error) return fail(u.error); toast('Logo actualizado'); loadLabels(); });
+      });
+    }
+  });
+  $('#labelList').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-act]'); if (!b) return;
+    e.preventDefault();
+    var box = b.closest('[data-i]'), l = labels[Number(box.dataset.i)];
+    if (b.dataset.act === 'saveAcc') {
+      var emails = Array.from(new Set(box.querySelector('[data-field="accounts"]').value.split(/[\s,;]+/).map(function (x) { return x.trim().toLowerCase(); }).filter(function (x) { return /@/.test(x); })));
+      sb.from('label_accounts').delete().eq('label_id', l.id).then(function (r) {
+        if (r.error) return fail(r.error);
+        if (!emails.length) { toast('Cuentas guardadas'); return loadLabels(); }
+        return sb.from('label_accounts').insert(emails.map(function (x) { return { label_id: l.id, email: x }; })).then(function (r2) { if (r2.error) return fail(r2.error); toast(emails.length + ' cuentas guardadas'); loadLabels(); });
+      });
+    }
+    if (b.dataset.act === 'addMember') {
+      var em = box.querySelector('[data-field="newMember"]').value.trim().toLowerCase();
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)) { toast('Email no válido', 'err'); return; }
+      sb.from('label_members').upsert({ label_id: l.id, email: em }).then(function (r) {
+        if (r.error) return fail(r.error);
+        return sb.auth.getSession().then(function (s) {
+          return fetch('/api/invitar', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + s.data.session.access_token }, body: JSON.stringify({ email: em }) });
+        }).then(function (res) { return res.json().then(function (j) { return { ok: res.ok, j: j }; }); }).then(function (x) {
+          toast(x.ok ? (x.j.existente ? 'Acceso dado (ya tenía usuario: que entre en /sellos con su email)' : 'Acceso dado e invitación enviada') : ('Acceso dado, pero la invitación falló: ' + (x.j.error || '')), x.ok ? 'ok' : 'err');
+          loadLabels();
+        });
+      });
+    }
+    if (b.dataset.act === 'delMember' && confirm('¿Quitar el acceso a ' + b.dataset.email + '?')) {
+      sb.from('label_members').delete().eq('label_id', l.id).eq('email', b.dataset.email).then(function (r) { if (r.error) return fail(r.error); toast('Acceso retirado'); loadLabels(); });
+    }
+    if (b.dataset.act === 'delLabel' && confirm('¿Eliminar el sello ' + l.name + '? Sus personas perderán el acceso. Los datos de rendimiento no se borran.')) {
+      sb.from('labels').delete().eq('id', l.id).then(function (r) { if (r.error) return fail(r.error); toast('Sello eliminado'); loadLabels(); });
+    }
+  });
+
+  /* ---------- Retiradas ---------- */
+  var tds = [];
+  function loadTakedowns() {
+    sb.from('takedown_requests').select('*, labels(name)').order('created_at', { ascending: false }).then(function (r) {
+      if (r.error) { $('#tdList').innerHTML = '<div class="empty">Falta crear las tablas de sellos: ejecuta supabase/v4-sellos.sql.</div>'; return; }
+      tds = r.data; renderTakedowns();
+    });
+  }
+  function renderTakedowns() {
+    var pend = tds.filter(function (t) { return t.status === 'pendiente'; }).length;
+    $('#tdBadge').textContent = pend ? '(' + pend + ')' : '';
+    $('#tdCount').innerHTML = '<b>' + pend + '</b> pendientes · ' + tds.length + ' en total';
+    var only = $('#tdPending').checked;
+    $('#tdList').innerHTML = tds.filter(function (t) { return !only || t.status === 'pendiente'; }).map(function (t) {
+      var i = tds.indexOf(t);
+      return '<div class="row" style="grid-template-columns:1fr auto" data-i="' + i + '"><div class="info">' +
+        '<div><b>' + esc((t.labels && t.labels.name) || 'Sello') + '</b> · <span class="mono" style="font-family:IBM Plex Mono,monospace">' + esc(t.isrc) + '</span> · ' + esc(t.email || '') + '</div>' +
+        '<div class="sub">' + fmtDate(t.created_at) + ' · pedido por ' + esc(t.requested_by) + (t.reason ? ' · "' + esc(t.reason) + '"' : '') + '</div>' +
+        '<input type="text" data-field="admin_note" value="' + esc(t.admin_note || '') + '" placeholder="Respuesta para el sello (opcional)"></div>' +
+        '<div class="acts" style="display:flex;gap:8px;align-items:center"><select data-field="status" style="min-height:34px;border-radius:8px;background:#050B10;color:#fff;border:1px solid var(--line);padding:0 8px">' +
+        ['pendiente', 'hecha', 'rechazada'].map(function (s) { return '<option' + (s === t.status ? ' selected' : '') + '>' + s + '</option>'; }).join('') + '</select></div></div>';
+    }).join('') || '<div class="empty">No hay solicitudes de retirada en esta vista.</div>';
+  }
+  $('#tdPending').addEventListener('change', renderTakedowns);
+  $('#tdList').addEventListener('change', function (e) {
+    var f = e.target.dataset.field; if (!f) return;
+    var t = tds[Number(e.target.closest('[data-i]').dataset.i)], patch = {}; patch[f] = e.target.value;
+    sb.from('takedown_requests').update(patch).eq('id', t.id).then(function (r) { if (r.error) return fail(r.error); Object.assign(t, patch); if (f === 'status') renderTakedowns(); toast('Guardado'); });
+  });
+
+  /* ---------- Datos (importación de exports) ---------- */
+  function loadXlsx() {
+    if (window.XLSX) return Promise.resolve();
+    return new Promise(function (ok, ko) { var s = document.createElement('script'); s.src = 'https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js'; s.onload = ok; s.onerror = ko; document.head.appendChild(s); });
+  }
+  function readRows(file) {
+    return loadXlsx().then(function () { return file.arrayBuffer(); }).then(function (buf) {
+      var wb = XLSX.read(buf, { type: 'array', cellDates: true });
+      return XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { defval: null });
+    });
+  }
+  function col(row, names) {
+    var keys = Object.keys(row);
+    for (var n = 0; n < names.length; n++) {
+      var want = names[n].toLowerCase().replace(/[^a-z0-9]/g, '');
+      for (var k = 0; k < keys.length; k++) if (keys[k].toLowerCase().replace(/[^a-z0-9]/g, '') === want) return row[keys[k]];
+    }
+    return null;
+  }
+  function num(v) { if (v == null || v === '') return null; var n = typeof v === 'number' ? v : Number(String(v).replace(',', '.')); return isNaN(n) ? null : n; }
+  function isoDate(v) { if (!v) return null; if (v instanceof Date) return v.toISOString().slice(0, 10); var d = new Date(v); return isNaN(d) ? null : d.toISOString().slice(0, 10); }
+  function status(msg) { $('#dStatus').textContent = msg; }
+  async function upsertBatches(table, rows, conflict) {
+    for (var i = 0; i < rows.length; i += 500) {
+      status('Importando ' + table + '… ' + Math.min(i + 500, rows.length) + ' / ' + rows.length);
+      var r = await sb.from(table).upsert(rows.slice(i, i + 500), { onConflict: conflict });
+      if (r.error) throw r.error;
+    }
+  }
+  function periodVal(id) { var v = $(id).value; return v ? v + '-01' : null; }
+  $('#dTrackGo').addEventListener('click', async function () {
+    var f = $('#dTrackFile').files[0], period = periodVal('#dTrackPeriod');
+    if (!f || !period) { toast('Elige el mes y el archivo', 'err'); return; }
+    try {
+      var raw = await readRows(f);
+      var rows = raw.map(function (r) {
+        return { period: period, isrc: String(col(r, ['ISRC', 'Track ISRC']) || '').trim(), email: String(col(r, ['Email']) || '').trim().toLowerCase(),
+          status: col(r, ['Status']), artist: col(r, ['Track Artist', 'Artist']), tsf: num(col(r, ['TSF'])), commission: num(col(r, ['Commission'])), gross: num(col(r, ['Gross'])) };
+      }).filter(function (r) { return r.isrc && r.email; });
+      if (!rows.length) { toast('No encuentro las columnas ISRC y Email en ese archivo', 'err'); return; }
+      status('Borrando datos anteriores de ' + period + '…');
+      var d = await sb.from('track_stats').delete().eq('period', period); if (d.error) throw d.error;
+      await upsertBatches('track_stats', rows, 'period,isrc');
+      status('Listo: ' + rows.length + ' pistas importadas para ' + period + '.'); toast('Rendimiento por pista importado'); loadPeriods();
+    } catch (err) { fail(err); status(''); }
+  });
+  $('#dAccGo').addEventListener('click', async function () {
+    var f = $('#dAccFile').files[0], period = periodVal('#dAccPeriod');
+    if (!f || !period) { toast('Elige el mes y el archivo', 'err'); return; }
+    try {
+      var raw = await readRows(f);
+      var rows = raw.map(function (r) {
+        return { period: period, email: String(col(r, ['email']) || '').trim().toLowerCase(), releases: num(col(r, ['Releases'])), tracks: num(col(r, ['Track', 'Tracks'])),
+          streams: num(col(r, ['Streams'])), gross: num(col(r, ['Gross'])), tsf: num(col(r, ['TSF'])), post_tsf: num(col(r, ['Post TSF'])) };
+      }).filter(function (r) { return r.email; });
+      if (!rows.length) { toast('No encuentro la columna email en ese archivo', 'err'); return; }
+      var d = await sb.from('account_stats').delete().eq('period', period); if (d.error) throw d.error;
+      await upsertBatches('account_stats', rows, 'period,email');
+      status('Listo: ' + rows.length + ' cuentas importadas para ' + period + '.'); toast('Rendimiento por cuenta importado'); loadPeriods();
+    } catch (err) { fail(err); status(''); }
+  });
+  $('#dMetaGo').addEventListener('click', async function () {
+    var f = $('#dMetaFile').files[0];
+    if (!f) { toast('Elige el archivo', 'err'); return; }
+    try {
+      var raw = await readRows(f), seen = {};
+      var rows = raw.map(function (r) {
+        return { isrc: String(col(r, ['Track ISRC', 'ISRC']) || '').trim(), title: col(r, ['Track Name', 'Track Title']), release_title: col(r, ['Release Title']),
+          release_date: isoDate(col(r, ['Release Date'])), main_artist: col(r, ['Main Artist']), record_label: col(r, ['Record Label']) };
+      }).filter(function (r) { if (!r.isrc || seen[r.isrc]) return false; seen[r.isrc] = 1; return true; });
+      if (!rows.length) { toast('No encuentro la columna Track ISRC en ese archivo', 'err'); return; }
+      await upsertBatches('track_meta', rows, 'isrc');
+      status('Listo: ' + rows.length + ' pistas de catálogo actualizadas.'); toast('Catálogo importado');
+    } catch (err) { fail(err); status(''); }
+  });
+  function loadPeriods() {
+    Promise.all([
+      sb.from('track_stats').select('period').order('period', { ascending: false }).limit(20000),
+      sb.from('account_stats').select('period').order('period', { ascending: false }).limit(5000)
+    ]).then(function (rs) {
+      if (rs[0].error) { $('#dPeriods').innerHTML = '<div class="empty">Falta ejecutar supabase/v4-sellos.sql.</div>'; return; }
+      var c = {}, a = {};
+      (rs[0].data || []).forEach(function (x) { c[x.period] = (c[x.period] || 0) + 1; });
+      (rs[1].data || []).forEach(function (x) { a[x.period] = (a[x.period] || 0) + 1; });
+      var ps = Array.from(new Set(Object.keys(c).concat(Object.keys(a)))).sort().reverse();
+      $('#dPeriods').innerHTML = ps.map(function (p) {
+        return '<div class="row" style="grid-template-columns:1fr auto"><div>' + new Date(p + 'T00:00:00').toLocaleDateString('es-ES', { month: 'long', year: 'numeric' }) +
+          ' <span class="sub">· ' + (c[p] || 0) + ' pistas · ' + (a[p] || 0) + ' cuentas</span></div><button class="btn btn--danger btn--sm" data-del-period="' + p + '">Borrar periodo</button></div>';
+      }).join('') || '<div class="empty">Aún no hay datos importados.</div>';
+    });
+  }
+  $('#dPeriods').addEventListener('click', function (e) {
+    var p = e.target.dataset.delPeriod; if (!p || !confirm('¿Borrar todos los datos de ' + p + '?')) return;
+    Promise.all([sb.from('track_stats').delete().eq('period', p), sb.from('account_stats').delete().eq('period', p)]).then(function (rs) {
+      var er = rs.find(function (r) { return r.error; }); if (er) return fail(er.error); toast('Periodo borrado'); loadPeriods();
+    });
+  });
+
   /* ---------- Ajustes ---------- */
   function loadSettings() {
     sb.from('settings').select('key,value').then(function (r) {
       if (r.error) return; // la tabla aún no existe: ejecutar supabase/settings.sql
       (r.data || []).forEach(function (f) {
         if (f.key === 'carousel_speed') { $('#speed').value = f.value; $('#speedOut').textContent = f.value; }
+        if (f.key === 'applications_open') $('#appsOpen').checked = f.value === 'true';
+        if (f.key === 'login_dark') $('#loginDark').checked = f.value === 'true';
+        if (f.key === 'tsf_threshold_aud') $('#tsfThreshold').value = f.value;
       });
     });
   }
   $('#speed').addEventListener('input', function () { $('#speedOut').textContent = this.value; });
   $('#saveSettings').addEventListener('click', function () {
-    sb.from('settings').upsert({ key: 'carousel_speed', value: String($('#speed').value) }).then(function (r) {
+    sb.from('settings').upsert([
+      { key: 'carousel_speed', value: String($('#speed').value) },
+      { key: 'applications_open', value: String($('#appsOpen').checked) },
+      { key: 'login_dark', value: String($('#loginDark').checked) },
+      { key: 'tsf_threshold_aud', value: String(Math.max(0, Number($('#tsfThreshold').value) || 0)) }
+    ]).then(function (r) {
       if (r.error) return fail(r.error);
       toast('Ajustes guardados');
     });

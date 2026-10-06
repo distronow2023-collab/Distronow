@@ -32,3 +32,32 @@ Sin los pasos 1–6 la web funciona igual con la lista de artistas de respaldo y
 ## Ajustes
 - Velocidad del carrusel de artistas: /admin → Ajustes (1 muy lento … 10 rápido; por defecto 3).
 - Si ya habías ejecutado `schema.sql` antes de esta versión, ejecuta también `supabase/settings.sql` en el SQL Editor de Supabase.
+
+## Solicitudes y contacto (v3)
+La web tiene dos formularios: "Distribuye con DistroNow" (solicitudes) y "Contacto".
+Cada envío se guarda en Supabase (se gestiona en /admin → Solicitudes / Mensajes) y llega por correo a info@distronow.com.
+
+Configuración (una vez):
+1. Supabase → SQL Editor: ejecuta `supabase/v3-formularios.sql` (si ya habías ejecutado schema.sql antes).
+2. Supabase → Project Settings → API: copia la clave **service_role** (secreta).
+3. Crea cuenta en resend.com con info@distronow.com, añade el dominio distronow.com (registros DNS que indica Resend) y crea una API key.
+4. Vercel → Settings → Environment Variables:
+   - `SUPABASE_SERVICE_ROLE_KEY` = clave service_role (NO compartir, NO poner en el código)
+   - `RESEND_API_KEY` = clave de Resend
+   - `MAIL_FROM` = `DistroNow Web <web@distronow.com>` (cuando el dominio esté verificado)
+   - `MAIL_TO` = `info@distronow.com` (opcional, es el valor por defecto)
+   Después, Redeploy.
+
+En /admin → Ajustes: abrir o cerrar solicitudes y activar el login en modo oscuro.
+
+## Back-office de sellos (v4) · /sellos
+- Cada sello (o A&R) entra en `/sellos` con su email (enlace sin contraseña) y ve solo sus cuentas: pistas, royalties, track fee y resultado por cuenta y por pista.
+- Herramienta "Track fee": pistas que no compensan su TSF (o están por debajo del umbral de Ajustes) y botón para pedir su retirada. Las solicitudes llegan por email y a /admin → Retiradas.
+- El sello puede subir su logo.
+
+Puesta en marcha:
+1. Supabase → SQL Editor: ejecuta `supabase/v4-sellos.sql`.
+2. (Opcional) Ejecuta el archivo PRIVADO `seed-sellos-PRIVADO.sql` que se entrega aparte. NO lo subas a GitHub.
+3. Supabase → Authentication → URL Configuration: añade tu dominio y `https://<tu-dominio>/sellos` en "Redirect URLs".
+4. Cada mes (día 15): /admin → Datos → importa el export GYRO "Track Level" (y "Account Level") con el mes del statement. Una vez, importa también el catálogo (track-level) para que se vean los títulos.
+5. /admin → Sellos: revisa las cuentas de cada sello y da acceso a sus A&R ("Dar acceso e invitar").

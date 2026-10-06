@@ -204,6 +204,44 @@ button { font: inherit; }
 .svc h3 { position: relative; margin: 0; font-family: var(--display); font-stretch: 125%; font-weight: 900; font-size: clamp(24px, 2.8vw, 34px); line-height: 1.05; color: #fff; }
 .svc p { position: relative; margin: 0; max-width: 460px; font-size: 16px; line-height: 1.55; color: var(--text-2); }
 
+/* Sellos */
+.labels-sec { padding-top: 72px; display: flex; flex-direction: column; gap: 28px; }
+.labels-sec__head { display: flex; flex-direction: column; gap: 14px; }
+.lbl-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(340px, 100%), 1fr)); gap: 14px; }
+.lbl-card { padding: 22px; border-radius: 16px; border: 1px solid var(--line); background: linear-gradient(180deg, rgba(255, 255, 255, .055), rgba(255, 255, 255, .02)); display: flex; flex-direction: column; gap: 10px; transition: border-color .25s ease, transform .25s ease; }
+.lbl-card:hover { border-color: rgba(120, 200, 255, .5); transform: translateY(-3px); }
+.lbl-card__num { font-family: var(--mono); font-weight: 700; font-size: 13px; color: var(--accent-2); }
+.lbl-card h3 { margin: 0; font-family: var(--display); font-stretch: 112%; font-weight: 800; font-size: 19px; color: #fff; }
+.lbl-card p { margin: 0; color: var(--text-2); font-size: 15px; line-height: 1.55; }
+
+/* Forms */
+.formsec { padding-top: 72px; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr)); gap: 28px; align-items: start; }
+.formsec__intro { display: flex; flex-direction: column; gap: 14px; }
+.formsec__lead { margin: 0; max-width: 440px; font-size: 17px; line-height: 1.55; color: var(--text-2); }
+.formcard { padding: 24px; border-radius: 16px; border: 1px solid var(--line); background: linear-gradient(180deg, rgba(255, 255, 255, .055), rgba(255, 255, 255, .02)); display: flex; flex-direction: column; gap: 16px; }
+.formcard[hidden] { display: none; }
+.formcard h3 { margin: 0; font-family: var(--display); font-stretch: 112%; font-weight: 800; font-size: 20px; color: #fff; }
+.formcard p { margin: 0; color: var(--text-2); }
+.fgrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.field { display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 600; color: var(--muted-2); }
+.field--wide { grid-column: 1 / -1; }
+.field input, .field textarea { width: 100%; min-height: 46px; padding: 11px 14px; border-radius: 10px; border: 1px solid rgba(255, 255, 255, .18); background: rgba(5, 11, 16, .6); color: #fff; font: inherit; font-weight: 400; font-size: 15px; }
+.field textarea { resize: vertical; min-height: 120px; }
+.field input:focus, .field textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(0, 157, 255, .25); }
+.field input[aria-invalid="true"], .field textarea[aria-invalid="true"] { border-color: #FF6B6B; }
+.check { display: flex; gap: 10px; align-items: flex-start; font-size: 14px; color: var(--text-2); }
+.check input { width: 18px; height: 18px; margin-top: 2px; accent-color: var(--accent); flex: none; }
+.hp { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+.formmsg { margin: 0; padding: 10px 14px; border-radius: 10px; font-size: 14px; }
+.formmsg.is-error { background: rgba(255, 107, 107, .12); color: #FFC2C2; }
+.formmsg.is-ok { background: rgba(61, 214, 140, .12); color: #A7F0CB; }
+.formcard .btn[disabled] { opacity: .6; cursor: progress; }
+@media (max-width: 560px) { .fgrid { grid-template-columns: 1fr; } }
+
+/* Login en modo oscuro (filtro sobre el iframe del proveedor) */
+.modal__frame.is-dark { background: #0F1C27; }
+.modal__frame.is-dark iframe { filter: invert(.9) hue-rotate(180deg) contrast(.95); }
+
 /* Cookie notice */
 .cookie { position: fixed; left: 16px; right: 16px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); z-index: 40; max-width: 720px; margin: 0 auto; padding: 14px 16px; border-radius: 14px; border: 1px solid rgba(120, 200, 255, .35); background: #0F1C27; box-shadow: 0 20px 50px rgba(0, 0, 0, .5); display: flex; align-items: center; gap: 16px; font-size: 14px; color: var(--text-2); }
 .cookie[hidden] { display: none; }
@@ -286,7 +324,8 @@ button { font: inherit; }
         <span class="brand__name">DISTRONOW</span>
       </a>
       <nav class="nav__actions">
-        <a href="mailto:info@distronow.com" class="nav__link">Contacto</a>
+        <a href="#sellos" class="nav__link">Sellos</a>
+        <a href="#contacto" class="nav__link">Contacto</a>
         <button type="button" class="btn btn--ghost btn--sm" data-open-login>Acceso artistas</button>
       </nav>
     </header>
@@ -299,7 +338,7 @@ button { font: inherit; }
         <p class="hero__sub">Distribución digital, royalties claros y datos para hacer crecer tu música. Tu equipo, tu solución.</p>
         <div class="hero__ctas">
           <button type="button" class="btn btn--primary" data-open-login>Entrar al panel →</button>
-          <a href="mailto:info@distronow.com" class="btn btn--ghost">Contacto</a>
+          <a href="#aplicar" class="btn btn--ghost" id="heroApply">Solicitar distribución</a>
         </div>
       </section>
 
@@ -363,6 +402,82 @@ button { font: inherit; }
           <div class="services__panel" id="servicesPanel" role="tabpanel"></div>
         </div>
       </section>
+
+      <section class="wrap labels-sec" id="sellos" aria-labelledby="labels-title">
+        <div class="labels-sec__head">
+          <div class="section-title">
+            <span class="section-title__bar"></span>
+            <h2 id="labels-title">Para sellos y A&amp;R</h2>
+          </div>
+          <p class="formsec__lead">Distribuye todo tu roster desde un solo sitio, con datos claros de cada cuenta y control de lo que cuesta mantener tu catálogo.</p>
+        </div>
+        <div class="lbl-grid">
+            <article class="lbl-card"><span class="lbl-card__num">01</span><h3>Distribución de todo tu roster</h3><p>Todos tus artistas bajo un mismo acuerdo, cada uno con su cuenta y su catálogo en orden.</p></article>
+            <article class="lbl-card"><span class="lbl-card__num">02</span><h3>Back-office A&amp;R y Sello</h3><p>Un panel propio para ver tus cuentas, tus pistas y los royalties de cada artista en cada statement.</p></article>
+            <article class="lbl-card"><span class="lbl-card__num">03</span><h3>Control del track fee</h3><p>Detectamos las pistas que no compensan su coste de mantenimiento y las retiramos cuando nos lo pides, desde el propio panel.</p></article>
+            <article class="lbl-card"><span class="lbl-card__num">04</span><h3>Condiciones a medida</h3><p>Cuota fija o porcentaje de royalties, según el tamaño y el volumen de tu sello.</p></article>
+            <article class="lbl-card"><span class="lbl-card__num">05</span><h3>Publishing con HANGAAR</h3><p>Registramos las obras de tus artistas para que cobren también como autores.</p></article>
+            <article class="lbl-card"><span class="lbl-card__num">06</span><h3>Estrategia de lanzamientos</h3><p>Planificamos con datos las fechas y prioridades de tu catálogo para sacar más partido a cada salida.</p></article>
+        </div>
+        <div class="hero__ctas" style="justify-content:flex-start">
+          <a href="/sellos" class="btn btn--primary">Acceso A&amp;R y Sello →</a>
+          <a href="#contacto" class="btn btn--ghost">Hablemos</a>
+        </div>
+      </section>
+
+      <section class="wrap formsec" id="aplicar" aria-labelledby="apply-title">
+        <div class="formsec__intro">
+          <div class="section-title">
+            <span class="section-title__bar"></span>
+            <h2 id="apply-title">Distribuye con DistroNow</h2>
+          </div>
+          <p class="formsec__lead">Trabajamos con un roster reducido para dar a cada artista atención de verdad. Cuéntanos quién eres y revisaremos tu proyecto.</p>
+        </div>
+        <div class="formcard" id="applyClosed" hidden>
+          <h3>Solicitudes cerradas por ahora</h3>
+          <p>En este momento no estamos incorporando nuevos artistas. Si quieres, escríbenos desde el formulario de contacto y te avisaremos cuando volvamos a abrir.</p>
+          <a href="#contacto" class="btn btn--soft btn--sm">Ir a contacto</a>
+        </div>
+        <form class="formcard" id="applyForm" novalidate>
+          <div class="fgrid">
+            <label class="field">Nombre artístico *<input name="artist_name" required maxlength="120" autocomplete="nickname"></label>
+            <label class="field">Tu nombre *<input name="name" required maxlength="120" autocomplete="name"></label>
+            <label class="field field--wide">Email *<input name="email" type="email" required maxlength="160" autocomplete="email"></label>
+            <label class="field field--wide">Perfil de Spotify *<input name="spotify" type="url" required placeholder="https://open.spotify.com/artist/…"></label>
+            <label class="field">Instagram<input name="instagram" type="url" placeholder="https://instagram.com/…"></label>
+            <label class="field">YouTube<input name="youtube" type="url" placeholder="https://youtube.com/@…"></label>
+            <label class="field">Número de tracks publicados<input name="tracks" type="number" min="0" step="1" inputmode="numeric"></label>
+            <label class="field">Oyentes mensuales en Spotify<input name="listeners" type="number" min="0" step="1" inputmode="numeric"></label>
+            <label class="field field--wide">¿Por qué quieres distribuir con DistroNow? *<textarea name="motivation" required minlength="20" maxlength="2000" rows="5"></textarea></label>
+          </div>
+          <input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+          <label class="check"><input type="checkbox" name="consent" required><span>He leído y acepto la <a href="/privacidad" target="_blank">política de privacidad</a>.</span></label>
+          <p class="formmsg" role="alert" hidden></p>
+          <button type="submit" class="btn btn--primary">Enviar solicitud</button>
+        </form>
+      </section>
+
+      <section class="wrap formsec" id="contacto" aria-labelledby="contact-title">
+        <div class="formsec__intro">
+          <div class="section-title">
+            <span class="section-title__bar"></span>
+            <h2 id="contact-title">Contacto</h2>
+          </div>
+          <p class="formsec__lead">¿Tienes una pregunta, una propuesta o eres un sello? Escríbenos y te respondemos por email.</p>
+        </div>
+        <form class="formcard" id="contactForm" novalidate>
+          <div class="fgrid">
+            <label class="field">Nombre *<input name="name" required maxlength="120" autocomplete="name"></label>
+            <label class="field">Email *<input name="email" type="email" required maxlength="160" autocomplete="email"></label>
+            <label class="field field--wide">Asunto<input name="subject" maxlength="160"></label>
+            <label class="field field--wide">Mensaje *<textarea name="message" required minlength="10" maxlength="3000" rows="5"></textarea></label>
+          </div>
+          <input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+          <label class="check"><input type="checkbox" name="consent" required><span>He leído y acepto la <a href="/privacidad" target="_blank">política de privacidad</a>.</span></label>
+          <p class="formmsg" role="alert" hidden></p>
+          <button type="submit" class="btn btn--primary">Enviar mensaje</button>
+        </form>
+      </section>
     </main>
 
     <footer class="wrap footer">
@@ -398,7 +513,7 @@ button { font: inherit; }
       </div>
       <div class="modal__links">
         <span class="muted">Acceso seguro al panel</span>
-        <a href="mailto:info@distronow.com">Quiero distribuir con DistroNow</a>
+        <a href="/sellos">Acceso A&amp;R y Sello →</a>
       </div>
     </div>
   </div>
@@ -448,6 +563,11 @@ button { font: inherit; }
   });
 
   var LOGIN_URL = 'https://distro.distronow.com/login-iframe';
+
+  // Ajustes que se editan desde /admin (velocidad del carrusel, solicitudes abiertas, login oscuro)
+  var SETTINGS = fetch('/api/settings')
+    .then(function (r) { return r.ok ? r.json() : {}; })
+    .catch(function () { return {}; });
 
   var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -641,10 +761,7 @@ button { font: inherit; }
     if (reduceMotion) { tr.style.overflowX = 'auto'; return; }
     // Velocidad 1 (muy lenta) a 10 (rápida). Se ajusta desde /admin → Ajustes.
     var level = 3;
-    fetch('/api/settings')
-      .then(function (r) { return r.ok ? r.json() : {}; })
-      .then(function (cfg) { var v = Number(cfg && cfg.carouselSpeed); if (v >= 1 && v <= 10) level = v; })
-      .catch(function () { /* se queda la velocidad por defecto */ });
+    SETTINGS.then(function (cfg) { var v = Number(cfg && cfg.carouselSpeed); if (v >= 1 && v <= 10) level = v; });
 
     var dir = 0, raf = null, pos = 0;
     function maxSpeed() { return 0.25 * level; } // píxeles por fotograma (nivel 3 ≈ 45 px/s)
@@ -683,6 +800,53 @@ button { font: inherit; }
         $('#partnersSection').hidden = false;
       })
       .catch(function () { /* sin partners: la sección queda oculta */ });
+  }
+
+  /* ---------- Formularios (solicitudes y contacto) ---------- */
+  function initForm(form, endpoint, okText) {
+    if (!form) return;
+    var opened = Date.now();
+    var msg = form.querySelector('.formmsg');
+    var btn = form.querySelector('button[type="submit"]');
+    function show(text, ok) { msg.textContent = text; msg.className = 'formmsg ' + (ok ? 'is-ok' : 'is-error'); msg.hidden = false; }
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var bad = null;
+      form.querySelectorAll('input, textarea').forEach(function (el) {
+        if (el.classList.contains('hp')) return;
+        var ok = el.checkValidity();
+        el.setAttribute('aria-invalid', ok ? 'false' : 'true');
+        if (!ok && !bad) bad = el;
+      });
+      if (bad) { show('Revisa los campos marcados.', false); bad.focus(); return; }
+      var data = {};
+      new FormData(form).forEach(function (v, k) { data[k] = v; });
+      data.consent = form.querySelector('[name="consent"]').checked;
+      data.t = opened;
+      btn.disabled = true;
+      fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) })
+        .then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { return { ok: r.ok, j: j }; }); })
+        .then(function (res) {
+          btn.disabled = false;
+          if (!res.ok) { show(res.j.error || 'No se ha podido enviar. Escríbenos a info@distronow.com.', false); return; }
+          form.reset(); opened = Date.now();
+          show(okText, true);
+        })
+        .catch(function () { btn.disabled = false; show('No se ha podido enviar. Revisa tu conexión o escríbenos a info@distronow.com.', false); });
+    });
+  }
+
+  function initApplications() {
+    var form = $('#applyForm');
+    initForm(form, '/api/aplicar', 'Solicitud enviada. La revisaremos y te responderemos por email.');
+    initForm($('#contactForm'), '/api/contacto', 'Mensaje enviado. Te responderemos por email lo antes posible.');
+    SETTINGS.then(function (cfg) {
+      if (cfg && cfg.applicationsOpen === false) {
+        form.hidden = true;
+        $('#applyClosed').hidden = false;
+        var hb = $('#heroApply'); hb.textContent = 'Contacto'; hb.setAttribute('href', '#contacto');
+      }
+    });
   }
 
   /* ---------- Aviso de cookies ---------- */
@@ -737,6 +901,7 @@ button { font: inherit; }
       lastFocus = document.activeElement;
       if (!frameBox.querySelector('iframe')) {
         frameBox.innerHTML = '<iframe src="' + LOGIN_URL + '" title="Acceso al panel DistroNow"></iframe>';
+        SETTINGS.then(function (cfg) { frameBox.classList.toggle('is-dark', !!(cfg && cfg.loginDark)); });
       }
       modal.hidden = false;
       document.body.classList.add('is-locked');
@@ -777,6 +942,7 @@ button { font: inherit; }
     initArtists();
     initPartners();
     initCookie();
+    initApplications();
     initServices();
     initLogin();
     initPointer();
