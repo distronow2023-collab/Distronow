@@ -1,5 +1,6 @@
 // Utilidades compartidas por las funciones de /api (los archivos que empiezan por _ no son rutas públicas).
-export const SUPABASE_URL = process.env.SUPABASE_URL || '';
+// Acepta la URL con o sin /rest/v1 o barra final (https://xxxx.supabase.co)
+export const SUPABASE_URL = (process.env.SUPABASE_URL || '').trim().replace(/\/+$/, '').replace(/\/rest\/v1$/, '').replace(/\/+$/, '');
 export const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY || '';
 
 export async function leerTabla(tabla) {
