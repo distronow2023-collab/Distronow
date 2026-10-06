@@ -87,11 +87,22 @@ main{padding:28px 0 60px}
     <!-- Login -->
     <form class="card login" id="loginForm" hidden>
       <h1>Acceso al panel</h1>
-      <p class="help" style="margin:0">Escribe tu email de administrador y te enviaremos un enlace para entrar. No hace falta contraseña.</p>
-      <label>Email<input type="email" id="email" autocomplete="email" required></label>
-      <button class="btn btn--primary" type="submit" id="loginBtn">Enviarme el enlace</button>
-      <p class="help" id="loginOk" role="status" hidden style="margin:0;color:#8BEBBE">Listo. Revisa tu correo y abre el enlace desde este mismo navegador.</p>
-      <p class="err" id="loginError" hidden></p>
+      <div id="stepEmail" style="display:flex;flex-direction:column;gap:14px">
+        <p class="muted help" style="margin:0">Escribe tu email de administrador y te enviaremos un código para entrar. No hace falta contraseña.</p>
+        <input type="email" id="email" required autocomplete="email" placeholder="tu@email.com" aria-label="Email" style="width:100%">
+        <button class="btn btn--primary" type="submit" id="loginBtn" style="justify-content:center">Enviarme el código</button>
+        <button type="button" class="btn btn--sm" id="haveCode" style="justify-content:center">Ya tengo un código</button>
+      </div>
+      <div id="stepCode" hidden style="display:flex;flex-direction:column;gap:14px">
+        <p class="muted help" style="margin:0">Te hemos enviado un código a <b id="codeEmail" style="color:#fff"></b>. Escríbelo aquí. Caduca en una hora.</p>
+        <input type="text" id="otp" inputmode="numeric" autocomplete="one-time-code" maxlength="10" placeholder="123456" aria-label="Código" style="width:100%;font-family:'IBM Plex Mono',monospace;font-size:22px;letter-spacing:.3em;text-align:center">
+        <button class="btn btn--primary" type="button" id="verifyBtn" style="justify-content:center">Entrar</button>
+        <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap">
+          <button type="button" class="btn btn--sm" id="backEmail">← Cambiar email</button>
+          <button type="button" class="btn btn--sm" id="resend">Reenviar código</button>
+        </div>
+      </div>
+      <p id="loginMsg" class="muted" role="status" hidden style="margin:0"></p>
     </form>
 
     <!-- App -->
@@ -263,17 +274,45 @@ main{padding:28px 0 60px}
 
   function showLogin() { $('#loginForm').hidden = false; $('#app').hidden = true; $('#hdrActions').hidden = true; }
 
-  $('#loginForm').addEventListener('submit', function (e) {
-    e.preventDefault();
-    var btn = $('#loginBtn'); btn.disabled = true; $('#loginError').hidden = true;
-    $('#loginOk').hidden = true;
-    sb.auth.signInWithOtp({ email: $('#email').value.trim().toLowerCase(), options: { emailRedirectTo: location.origin + '/admin' } })
-      .then(function (r) {
-        btn.disabled = false;
-        if (r.error) { $('#loginError').textContent = 'No se pudo enviar el enlace. Espera un minuto y vuelve a intentarlo.'; $('#loginError').hidden = false; return; }
-        $('#loginOk').hidden = false;
-      });
+  /* ---------- Acceso con código de un solo uso (OTP) ---------- */
+  function lmsg(t, bad) { var m = $('#loginMsg'); m.textContent = t; m.style.color = bad ? '#FFB3B3' : '#8BEBBE'; m.hidden = !t; }
+  function loginEmail() { return $('#email').value.trim().toLowerCase(); }
+  function toCode(em) { $('#codeEmail').textContent = em || 'tu email'; $('#stepEmail').hidden = true; $('#stepCode').hidden = false; $('#otp').value = ''; $('#otp').focus(); }
+  function sendCode() {
+    var em = loginEmail();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)) { lmsg('Escribe un email válido.', true); return; }
+    var btn = $('#loginBtn'); btn.disabled = true; lmsg('');
+    sb.auth.signInWithOtp({ email: em, options: { shouldCreateUser: true } }).then(function (r) {
+      btn.disabled = false;
+      if (r.error) {
+        var lim = r.error.status === 429 || /rate|seconds/i.test(r.error.message || '');
+        lmsg(lim ? 'Se han pedido demasiados códigos. Espera unos minutos; si ya te llegó uno, pulsa "Ya tengo un código".' : 'No se pudo enviar el código. Revisa el email e inténtalo de nuevo.', true);
+        return;
+      }
+      try { localStorage.setItem('dn-login-email', em); } catch (e) {}
+      toCode(em); lmsg('Código enviado. Revisa tu correo (y la carpeta de spam).');
+    });
+  }
+  $('#loginForm').addEventListener('submit', function (e) { e.preventDefault(); if ($('#stepCode').hidden) sendCode(); else verify(); });
+  $('#haveCode').addEventListener('click', function () {
+    var em = loginEmail(); if (!em) { try { em = localStorage.getItem('dn-login-email') || ''; } catch (e) {} $('#email').value = em; }
+    if (!em) { lmsg('Escribe primero tu email.', true); return; }
+    lmsg(''); toCode(em);
   });
+  $('#backEmail').addEventListener('click', function () { $('#stepCode').hidden = true; $('#stepEmail').hidden = false; lmsg(''); });
+  $('#resend').addEventListener('click', function () { $('#stepCode').hidden = true; $('#stepEmail').hidden = false; sendCode(); });
+  function verify() {
+    var token = $('#otp').value.replace(/\D/g, '');
+    if (token.length < 6) { lmsg('El código tiene al menos 6 cifras.', true); return; }
+    var btn = $('#verifyBtn'); btn.disabled = true; lmsg('');
+    sb.auth.verifyOtp({ email: loginEmail(), token: token, type: 'email' }).then(function (r) {
+      btn.disabled = false;
+      if (r.error) { lmsg('Código incorrecto o caducado. Pide uno nuevo con "Reenviar código".', true); return; }
+      lmsg('');
+    });
+  }
+  $('#verifyBtn').addEventListener('click', verify);
+  $('#otp').addEventListener('input', function () { var v = this.value.replace(/\D/g, ''); if (v.length === 6 || v.length === 8) verify(); });
   $('#logout').addEventListener('click', function () { sb.auth.signOut().then(function () { location.reload(); }); });
 
   function enter() {
