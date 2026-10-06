@@ -111,7 +111,6 @@ main{padding:28px 0 60px}
 
     <!-- App -->
     <section id="app" hidden>
-      <p class="err" id="notAdmin" hidden>Tu usuario no tiene permiso para editar. Pide a un socio que añada tu email a la tabla de administradores.</p>
       <div class="tabs" role="tablist">
         <button class="tab" role="tab" aria-selected="true" data-tab="applications">Solicitudes <span id="appBadge"></span></button>
         <button class="tab" role="tab" aria-selected="false" data-tab="messages">Mensajes <span id="msgBadge"></span></button>
@@ -355,9 +354,26 @@ main{padding:28px 0 60px}
   $('#logout').addEventListener('click', function () { sb.auth.signOut().then(function () { location.reload(); }); });
 
   function enter() {
-    $('#loginForm').hidden = true; $('#app').hidden = false; $('#hdrActions').hidden = false;
-    sb.from('admins').select('email').then(function (r) { $('#notAdmin').hidden = !!(r.data && r.data.length); });
-    loadApplications(); loadMessages(); loadArtists(); loadPartners(); loadSettings(); loadLabels(); loadTakedowns();
+    $('#loginForm').hidden = true;
+    // Solo administradores: cualquier otro usuario ve el aviso y nada más
+    sb.from('admins').select('email').then(function (r) {
+      var ok = !!(r.data && r.data.length);
+      $('#hdrActions').hidden = false;
+      if (!ok) {
+        $('#app').hidden = true;
+        var d = document.getElementById('denied');
+        if (!d) {
+          d = document.createElement('div'); d.id = 'denied'; d.className = 'card login';
+          d.innerHTML = '<h1>Sin acceso</h1><p class="help" style="margin:0">Este panel es solo para la administración de DistroNow. Si eres un sello, entra en <a href="/sellos">/sellos</a>.</p>';
+          $('#loginForm').parentNode.insertBefore(d, $('#loginForm'));
+        }
+        d.hidden = false;
+        $('#pwBtn').hidden = true;
+        return;
+      }
+      $('#app').hidden = false;
+      loadApplications(); loadMessages(); loadArtists(); loadPartners(); loadSettings(); loadLabels(); loadTakedowns();
+    });
   }
 
   document.querySelectorAll('[data-tab]').forEach(function (b) {
