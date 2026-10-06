@@ -29,7 +29,7 @@ button,input,select,textarea{font:inherit}
 .btn--warn{background:rgba(255,107,107,.14);border-color:rgba(255,107,107,.5);color:#FFD0D0}
 .btn--sm{min-height:34px;padding:0 12px;font-size:13px}
 .btn:disabled{opacity:.5;cursor:not-allowed}
-input[type=email],input[type=search],input[type=text],select,textarea{min-height:40px;padding:0 12px;border-radius:10px;border:1px solid rgba(255,255,255,.18);background:rgba(5,11,16,.7);color:#fff}
+input[type=email],input[type=password],input[type=search],input[type=text],select,textarea{min-height:40px;padding:0 12px;border-radius:10px;border:1px solid rgba(255,255,255,.18);background:rgba(5,11,16,.7);color:#fff}
 textarea{padding:10px 12px;width:100%;min-height:80px}
 input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(0,157,255,.25)}
 main{padding:26px 0 60px}
@@ -84,6 +84,7 @@ tbody tr:hover{background:rgba(255,255,255,.03)}
     <div class="hdr" id="hdr" hidden>
       <select id="labelSel" aria-label="Sello" hidden></select>
       <select id="periodSel" aria-label="Periodo"></select>
+      <button class="btn btn--sm" id="pwBtn">Contraseña</button>
       <button class="btn btn--sm" id="openClaim" hidden>+ Reclamar otro sello</button>
       <button class="btn btn--sm" id="logout">Cerrar sesión</button>
     </div>
@@ -95,9 +96,12 @@ tbody tr:hover{background:rgba(255,255,255,.03)}
     <form class="card login" id="loginForm" hidden>
       <h1>Acceso A&amp;R y Sellos</h1>
       <div id="stepEmail" style="display:flex;flex-direction:column;gap:14px">
-        <p class="muted help" style="margin:0">Escribe tu email y te enviaremos un código para entrar, sin contraseña. Si es tu primera vez, después te pediremos el código de tu sello.</p>
+        <p class="muted help" style="margin:0">Entra con tu email y tu contraseña. Si es tu primera vez, pide un código por email; dentro podrás crear tu contraseña y reclamar tu sello.</p>
         <input type="email" id="email" required autocomplete="email" placeholder="tu@email.com" aria-label="Email" style="width:100%">
-        <button class="btn btn--primary" type="submit" id="loginBtn" style="justify-content:center">Enviarme el código</button>
+        <input type="password" id="pass" autocomplete="current-password" placeholder="Contraseña (si ya la creaste)" aria-label="Contraseña" style="width:100%">
+        <button class="btn btn--primary" type="button" id="passBtn" style="justify-content:center">Entrar con contraseña</button>
+        <div style="display:flex;align-items:center;gap:10px;color:var(--muted);font-size:12px"><span style="flex:1;height:1px;background:var(--line)"></span>o sin contraseña<span style="flex:1;height:1px;background:var(--line)"></span></div>
+        <button class="btn" type="submit" id="loginBtn" style="justify-content:center">Enviarme un código por email</button>
         <button type="button" class="btn btn--sm" id="haveCode" style="justify-content:center">Ya tengo un código</button>
       </div>
       <div id="stepCode" hidden style="display:flex;flex-direction:column;gap:14px">
@@ -190,6 +194,17 @@ tbody tr:hover{background:rgba(255,255,255,.03)}
   </div>
 </div>
 
+<div id="pwDialog" hidden style="position:fixed;inset:0;background:rgba(5,11,16,.75);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;padding:20px;z-index:30">
+  <form class="card" id="pwForm" style="max-width:420px;width:100%;display:flex;flex-direction:column;gap:12px" role="dialog" aria-modal="true" aria-labelledby="pwTitle">
+    <h2 id="pwTitle" style="margin:0;font-size:20px">Tu contraseña</h2>
+    <p class="muted" style="margin:0;font-size:14px">Con ella podrás entrar sin esperar ningún correo. Mínimo 10 caracteres.</p>
+    <input type="password" id="pw1" autocomplete="new-password" placeholder="Nueva contraseña" aria-label="Nueva contraseña" style="width:100%" minlength="10" required>
+    <input type="password" id="pw2" autocomplete="new-password" placeholder="Repítela" aria-label="Repite la contraseña" style="width:100%" minlength="10" required>
+    <p id="pwMsg" style="margin:0;font-size:14px;color:#FFB3B3" hidden></p>
+    <div style="display:flex;gap:10px;justify-content:flex-end"><button type="button" class="btn" id="pwCancel">Cancelar</button><button type="submit" class="btn btn--primary" id="pwSave">Guardar</button></div>
+  </form>
+</div>
+
 <div class="toast" id="toast" hidden></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -246,7 +261,17 @@ tbody tr:hover{background:rgba(255,255,255,.03)}
       toCode(em); lmsg('Código enviado. Revisa tu correo (y la carpeta de spam).');
     });
   }
-  $('#loginForm').addEventListener('submit', function (e) { e.preventDefault(); if ($('#stepCode').hidden) sendCode(); else verify(); });
+  $('#loginForm').addEventListener('submit', function (e) { e.preventDefault(); if (!$('#stepCode').hidden) verify(); else if ($('#pass').value) passLogin(); else sendCode(); });
+  function passLogin() {
+    var em = loginEmail(), pw = $('#pass').value;
+    if (!em || !pw) { lmsg('Escribe tu email y tu contraseña.', true); return; }
+    var b = $('#passBtn'); b.disabled = true; lmsg('');
+    sb.auth.signInWithPassword({ email: em, password: pw }).then(function (r) {
+      b.disabled = false;
+      if (r.error) lmsg('Email o contraseña incorrectos. Si aún no tienes contraseña, entra con un código y créala dentro.', true);
+    });
+  }
+  $('#passBtn').addEventListener('click', passLogin);
   $('#haveCode').addEventListener('click', function () {
     var em = loginEmail(); if (!em) { try { em = localStorage.getItem('dn-login-email') || ''; } catch (e) {} $('#email').value = em; }
     if (!em) { lmsg('Escribe primero tu email.', true); return; }
@@ -265,6 +290,20 @@ tbody tr:hover{background:rgba(255,255,255,.03)}
     });
   }
   $('#verifyBtn').addEventListener('click', verify);
+  $('#pwBtn').addEventListener('click', function () { $('#pw1').value = ''; $('#pw2').value = ''; $('#pwMsg').hidden = true; $('#pwDialog').hidden = false; $('#pw1').focus(); });
+  $('#pwCancel').addEventListener('click', function () { $('#pwDialog').hidden = true; });
+  $('#pwForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var a = $('#pw1').value, b = $('#pw2').value, m = $('#pwMsg');
+    if (a.length < 10) { m.textContent = 'Mínimo 10 caracteres.'; m.hidden = false; return; }
+    if (a !== b) { m.textContent = 'Las contraseñas no coinciden.'; m.hidden = false; return; }
+    $('#pwSave').disabled = true;
+    sb.auth.updateUser({ password: a }).then(function (r) {
+      $('#pwSave').disabled = false;
+      if (r.error) { m.textContent = 'No se pudo guardar: ' + (r.error.message || 'inténtalo de nuevo'); m.hidden = false; return; }
+      $('#pwDialog').hidden = true; toast('Contraseña guardada. La próxima vez entra con ella.');
+    });
+  });
   $('#otp').addEventListener('input', function () { var v = this.value.replace(/\D/g, ''); if (v.length === 6 || v.length === 8) verify(); });
   $('#logout').addEventListener('click', function () { sb.auth.signOut().then(function () { location.reload(); }); });
 
