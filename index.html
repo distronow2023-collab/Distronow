@@ -324,7 +324,7 @@ button { font: inherit; }
         <span class="brand__name">DISTRONOW</span>
       </a>
       <nav class="nav__actions">
-        <a href="#contacto" class="nav__link">Contacto</a>
+        <a href="mailto:info@distronow.com" class="nav__link">Contacto</a>
         <button type="button" class="btn btn--ghost btn--sm" data-open-login>Acceso artistas</button>
       </nav>
     </header>
@@ -337,7 +337,7 @@ button { font: inherit; }
         <p class="hero__sub">Distribución digital, royalties claros y datos para hacer crecer tu música. Tu equipo, tu solución.</p>
         <div class="hero__ctas">
           <button type="button" class="btn btn--primary" data-open-login>Entrar al panel →</button>
-          <a href="#aplicar" class="btn btn--ghost" id="heroApply">Solicitar distribución</a>
+          <a href="mailto:info@distronow.com" class="btn btn--ghost">Contacto</a>
         </div>
       </section>
 
@@ -420,63 +420,10 @@ button { font: inherit; }
         </div>
         <div class="hero__ctas" style="justify-content:flex-start">
           <a href="/sellos" class="btn btn--primary">Acceso A&amp;R y Sello →</a>
-          <a href="#contacto" class="btn btn--ghost">Hablemos</a>
+          <a href="mailto:info@distronow.com" class="btn btn--ghost">Hablemos</a>
         </div>
       </section>
 
-      <section class="wrap formsec" id="aplicar" aria-labelledby="apply-title">
-        <div class="formsec__intro">
-          <div class="section-title">
-            <span class="section-title__bar"></span>
-            <h2 id="apply-title">Distribuye con DistroNow</h2>
-          </div>
-          <p class="formsec__lead">Trabajamos con un roster reducido para dar a cada artista atención de verdad. Cuéntanos quién eres y revisaremos tu proyecto.</p>
-        </div>
-        <div class="formcard" id="applyClosed" hidden>
-          <h3>Solicitudes cerradas por ahora</h3>
-          <p>En este momento no estamos incorporando nuevos artistas. Si quieres, escríbenos desde el formulario de contacto y te avisaremos cuando volvamos a abrir.</p>
-          <a href="#contacto" class="btn btn--soft btn--sm">Ir a contacto</a>
-        </div>
-        <form class="formcard" id="applyForm" novalidate>
-          <div class="fgrid">
-            <label class="field">Nombre artístico *<input name="artist_name" required maxlength="120" autocomplete="nickname"></label>
-            <label class="field">Tu nombre *<input name="name" required maxlength="120" autocomplete="name"></label>
-            <label class="field field--wide">Email *<input name="email" type="email" required maxlength="160" autocomplete="email"></label>
-            <label class="field field--wide">Perfil de Spotify *<input name="spotify" type="url" required placeholder="https://open.spotify.com/artist/…"></label>
-            <label class="field">Instagram<input name="instagram" type="url" placeholder="https://instagram.com/…"></label>
-            <label class="field">YouTube<input name="youtube" type="url" placeholder="https://youtube.com/@…"></label>
-            <label class="field">Número de tracks publicados<input name="tracks" type="number" min="0" step="1" inputmode="numeric"></label>
-            <label class="field">Oyentes mensuales en Spotify<input name="listeners" type="number" min="0" step="1" inputmode="numeric"></label>
-            <label class="field field--wide">¿Por qué quieres distribuir con DistroNow? *<textarea name="motivation" required minlength="20" maxlength="2000" rows="5"></textarea></label>
-          </div>
-          <input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
-          <label class="check"><input type="checkbox" name="consent" required><span>He leído y acepto la <a href="/privacidad" target="_blank">política de privacidad</a>.</span></label>
-          <p class="formmsg" role="alert" hidden></p>
-          <button type="submit" class="btn btn--primary">Enviar solicitud</button>
-        </form>
-      </section>
-
-      <section class="wrap formsec" id="contacto" aria-labelledby="contact-title">
-        <div class="formsec__intro">
-          <div class="section-title">
-            <span class="section-title__bar"></span>
-            <h2 id="contact-title">Contacto</h2>
-          </div>
-          <p class="formsec__lead">¿Tienes una pregunta, una propuesta o eres un sello? Escríbenos y te respondemos por email.</p>
-        </div>
-        <form class="formcard" id="contactForm" novalidate>
-          <div class="fgrid">
-            <label class="field">Nombre *<input name="name" required maxlength="120" autocomplete="name"></label>
-            <label class="field">Email *<input name="email" type="email" required maxlength="160" autocomplete="email"></label>
-            <label class="field field--wide">Asunto<input name="subject" maxlength="160"></label>
-            <label class="field field--wide">Mensaje *<textarea name="message" required minlength="10" maxlength="3000" rows="5"></textarea></label>
-          </div>
-          <input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
-          <label class="check"><input type="checkbox" name="consent" required><span>He leído y acepto la <a href="/privacidad" target="_blank">política de privacidad</a>.</span></label>
-          <p class="formmsg" role="alert" hidden></p>
-          <button type="submit" class="btn btn--primary">Enviar mensaje</button>
-        </form>
-      </section>
     </main>
 
     <footer class="wrap footer">
@@ -941,7 +888,6 @@ button { font: inherit; }
     initArtists();
     initPartners();
     initCookie();
-    initApplications();
     initServices();
     initLogin();
     initPointer();
