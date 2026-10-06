@@ -239,8 +239,6 @@ button { font: inherit; }
 @media (max-width: 560px) { .fgrid { grid-template-columns: 1fr; } }
 
 /* Login en modo oscuro (filtro sobre el iframe del proveedor) */
-.modal__frame.is-dark { background: #0F1C27; }
-.modal__frame.is-dark iframe { filter: invert(.9) hue-rotate(180deg) contrast(.95); }
 
 /* Cookie notice */
 .cookie { position: fixed; left: 16px; right: 16px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); z-index: 40; max-width: 720px; margin: 0 auto; padding: 14px 16px; border-radius: 14px; border: 1px solid rgba(120, 200, 255, .35); background: #0F1C27; box-shadow: 0 20px 50px rgba(0, 0, 0, .5); display: flex; align-items: center; gap: 16px; font-size: 14px; color: var(--text-2); }
@@ -278,7 +276,7 @@ button { font: inherit; }
 .modal__close { position: absolute; top: 12px; right: 12px; width: 44px; height: 44px; border-radius: 10px; border: none; background: transparent; color: var(--muted-2); cursor: pointer; display: flex; align-items: center; justify-content: center; }
 .modal__brand { display: flex; align-items: center; gap: 12px; }
 .modal__title { margin: 0; font-family: var(--display); font-stretch: 125%; font-weight: 900; font-size: 26px; color: #fff; }
-.modal__frame { border-radius: 12px; overflow: hidden; background: #fff; box-shadow: 0 0 0 1px rgba(255, 255, 255, .2), 0 12px 32px rgba(0, 0, 0, .35); min-height: 400px; }
+.modal__frame { border-radius: 12px; overflow: hidden; background: #0A141C; box-shadow: 0 0 0 1px rgba(255, 255, 255, .2), 0 12px 32px rgba(0, 0, 0, .35); min-height: 400px; }
 .modal__frame iframe { display: block; width: 100%; height: 400px; border: 0; }
 .modal__links { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; font-size: 13px; }
 
@@ -413,10 +411,9 @@ button { font: inherit; }
         <div class="lbl-grid">
             <article class="lbl-card"><span class="lbl-card__num">01</span><h3>Distribución de todo tu roster</h3><p>Todos tus artistas bajo un mismo acuerdo, cada uno con su cuenta y su catálogo en orden.</p></article>
             <article class="lbl-card"><span class="lbl-card__num">02</span><h3>Back-office A&amp;R y Sello</h3><p>Un panel propio para ver tus cuentas, tus pistas y los royalties de cada artista en cada statement.</p></article>
-            <article class="lbl-card"><span class="lbl-card__num">03</span><h3>Control del track fee</h3><p>Detectamos las pistas que no compensan su coste de mantenimiento y las retiramos cuando nos lo pides, desde el propio panel.</p></article>
+            <article class="lbl-card"><span class="lbl-card__num">03</span><h3>Control del catálogo</h3><p>Ves en todo momento qué pistas tiene cada cuenta, cuáles rinden y cuáles conviene retirar, y nos pides los cambios desde el propio panel.</p></article>
             <article class="lbl-card"><span class="lbl-card__num">04</span><h3>Condiciones a medida</h3><p>Cuota fija o porcentaje de royalties, según el tamaño y el volumen de tu sello.</p></article>
-            <article class="lbl-card"><span class="lbl-card__num">05</span><h3>Publishing con HANGAAR</h3><p>Registramos las obras de tus artistas para que cobren también como autores.</p></article>
-            <article class="lbl-card"><span class="lbl-card__num">06</span><h3>Estrategia de lanzamientos</h3><p>Planificamos con datos las fechas y prioridades de tu catálogo para sacar más partido a cada salida.</p></article>
+                        <article class="lbl-card"><span class="lbl-card__num">05</span><h3>Estrategia de lanzamientos</h3><p>Planificamos con datos las fechas y prioridades de tu catálogo para sacar más partido a cada salida.</p></article>
         </div>
         <div class="hero__ctas" style="justify-content:flex-start">
           <a href="/sellos" class="btn btn--primary">Acceso A&amp;R y Sello →</a>
@@ -847,7 +844,6 @@ button { font: inherit; }
       lastFocus = document.activeElement;
       if (!frameBox.querySelector('iframe')) {
         frameBox.innerHTML = '<iframe src="' + LOGIN_URL + '" title="Acceso al panel DistroNow"></iframe>';
-        SETTINGS.then(function (cfg) { frameBox.classList.toggle('is-dark', !!(cfg && cfg.loginDark)); });
       }
       modal.hidden = false;
       document.body.classList.add('is-locked');

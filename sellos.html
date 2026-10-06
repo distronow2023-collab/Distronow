@@ -29,7 +29,7 @@ button,input,select,textarea{font:inherit}
 .btn--warn{background:rgba(255,107,107,.14);border-color:rgba(255,107,107,.5);color:#FFD0D0}
 .btn--sm{min-height:34px;padding:0 12px;font-size:13px}
 .btn:disabled{opacity:.5;cursor:not-allowed}
-input[type=email],input[type=search],select,textarea{min-height:40px;padding:0 12px;border-radius:10px;border:1px solid rgba(255,255,255,.18);background:rgba(5,11,16,.7);color:#fff}
+input[type=email],input[type=search],input[type=text],select,textarea{min-height:40px;padding:0 12px;border-radius:10px;border:1px solid rgba(255,255,255,.18);background:rgba(5,11,16,.7);color:#fff}
 textarea{padding:10px 12px;width:100%;min-height:80px}
 input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(0,157,255,.25)}
 main{padding:26px 0 60px}
@@ -84,6 +84,7 @@ tbody tr:hover{background:rgba(255,255,255,.03)}
     <div class="hdr" id="hdr" hidden>
       <select id="labelSel" aria-label="Sello" hidden></select>
       <select id="periodSel" aria-label="Periodo"></select>
+      <button class="btn btn--sm" id="openClaim" hidden>+ Reclamar otro sello</button>
       <button class="btn btn--sm" id="logout">Cerrar sesión</button>
     </div>
   </header>
@@ -93,18 +94,24 @@ tbody tr:hover{background:rgba(255,255,255,.03)}
 
     <form class="card login" id="loginForm" hidden>
       <h1>Acceso A&amp;R y Sellos</h1>
-      <p class="muted" style="margin:0">Escribe el email con el que DistroNow dio de alta a tu sello. Te enviaremos un enlace para entrar, sin contraseña.</p>
+      <p class="muted" style="margin:0">Escribe tu email y te enviaremos un enlace para entrar, sin contraseña. Si es tu primera vez, después te pediremos el código de tu sello.</p>
       <input type="email" id="email" required autocomplete="email" placeholder="tu@sello.com" aria-label="Email">
       <button class="btn btn--primary" type="submit" id="loginBtn" style="justify-content:center">Enviarme el enlace</button>
       <p id="loginMsg" class="muted" role="status" hidden></p>
       <a href="/" class="muted" style="font-size:13px">← Volver a la web</a>
     </form>
 
-    <div class="card" id="noLabel" hidden>
-      <h2 style="margin:0 0 8px">Tu email no está asociado a ningún sello</h2>
-      <p class="muted" style="margin:0">Pide a DistroNow que te añada como miembro de tu sello en <a href="mailto:info@distronow.com">info@distronow.com</a>.</p>
-    </div>
+    <form class="card login" id="noLabel" hidden>
+      <h1>Reclama tu sello</h1>
+      <p class="muted" style="margin:0">Introduce el código que te ha enviado DistroNow (empieza por <span class="mono">DN-</span>). Al reclamarlo, tu cuenta quedará vinculada al sello y verás sus cuentas y su rendimiento.</p>
+      <input type="text" id="claimCode" required autocomplete="off" spellcheck="false" placeholder="DN-XXXXXXXX" aria-label="Código del sello" style="width:100%;text-transform:uppercase;font-family:'IBM Plex Mono',monospace;letter-spacing:.08em">
+      <button class="btn btn--primary" type="submit" id="claimBtn" style="justify-content:center">Reclamar sello</button>
+      <p id="claimMsg" class="muted" role="status" hidden style="margin:0"></p>
+      <p class="muted" style="margin:0;font-size:13px">¿No tienes código? Pídelo en <a href="mailto:info@distronow.com">info@distronow.com</a>.</p>
+      <button type="button" class="btn btn--sm" id="cancelClaim" hidden style="justify-content:center">Volver a mis sellos</button>
+    </form>
 
+    <div id="adminBanner" hidden style="margin-bottom:16px;padding:10px 14px;border-radius:10px;background:rgba(255,181,71,.12);border:1px solid rgba(255,181,71,.4);color:#FFCF85;font-size:14px">Vista de administrador: estás viendo exactamente lo que ve este sello. Cambia de sello con el selector de arriba.</div>
     <section id="app" hidden>
       <div class="label-head">
         <div class="logo" id="logoBox"></div>
@@ -120,7 +127,7 @@ tbody tr:hover{background:rgba(255,255,255,.03)}
       <div class="tabs" role="tablist">
         <button class="tab" role="tab" aria-selected="true" data-tab="accounts">Cuentas</button>
         <button class="tab" role="tab" aria-selected="false" data-tab="tracks">Pistas</button>
-        <button class="tab" role="tab" aria-selected="false" data-tab="tsf">Track fee</button>
+        <button class="tab" role="tab" aria-selected="false" data-tab="tsf">Control del catálogo</button>
         <button class="tab" role="tab" aria-selected="false" data-tab="requests">Mis solicitudes</button>
       </div>
 
@@ -211,28 +218,73 @@ tbody tr:hover{background:rgba(255,255,255,.03)}
   $('#loginForm').addEventListener('submit', function (e) {
     e.preventDefault();
     var btn = $('#loginBtn'); btn.disabled = true;
-    sb.auth.signInWithOtp({ email: $('#email').value.trim().toLowerCase(), options: { shouldCreateUser: false, emailRedirectTo: location.origin + '/sellos' } })
+    sb.auth.signInWithOtp({ email: $('#email').value.trim().toLowerCase(), options: { shouldCreateUser: true, emailRedirectTo: location.origin + '/sellos' } })
       .then(function (r) {
         btn.disabled = false;
         var m = $('#loginMsg'); m.hidden = false;
-        m.textContent = r.error ? 'No hemos podido enviarte el enlace. Comprueba que es el email que te dio de alta DistroNow.' : 'Listo. Revisa tu correo y abre el enlace desde este mismo navegador.';
+        m.textContent = r.error ? 'No hemos podido enviarte el enlace. Espera un minuto y vuelve a intentarlo.' : 'Listo. Revisa tu correo y abre el enlace desde este mismo navegador.';
       });
   });
   $('#logout').addEventListener('click', function () { sb.auth.signOut().then(function () { location.reload(); }); });
 
+  /* ---------- Reclamar sello con código ---------- */
+  // El código puede venir en el enlace: /sellos?codigo=DN-XXXXXXXX (se guarda para después del login)
+  var viewParam = Number(new URLSearchParams(location.search).get('ver')) || 0, isAdmin = false;
+  (function () {
+    var c = new URLSearchParams(location.search).get('codigo');
+    if (c) { try { localStorage.setItem('dn-claim', c); } catch (e) {} history.replaceState(null, '', location.pathname); }
+  })();
+  function pendingCode() { try { return localStorage.getItem('dn-claim') || ''; } catch (e) { return ''; } }
+  function showClaim(hasLabels) {
+    $('#app').hidden = true; $('#noLabel').hidden = false; $('#hdr').hidden = false;
+    $('#periodSel').hidden = true; $('#labelSel').hidden = true; $('#openClaim').hidden = true;
+    $('#cancelClaim').hidden = !hasLabels;
+    if (pendingCode()) $('#claimCode').value = pendingCode();
+    $('#claimCode').focus();
+  }
+  $('#noLabel').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    var code = $('#claimCode').value.trim().toUpperCase().replace(/\s+/g, '');
+    if (!code) return;
+    var btn = $('#claimBtn'), msg = $('#claimMsg'); btn.disabled = true; msg.hidden = true;
+    var r = await sb.rpc('claim_label', { p_code: code });
+    btn.disabled = false;
+    if (r.error) { msg.textContent = 'Código no válido o ya usado. Revísalo o pide uno nuevo a DistroNow.'; msg.style.color = '#FFB3B3'; msg.hidden = false; return; }
+    try { localStorage.removeItem('dn-claim'); } catch (e2) {}
+    var name = (r.data && r.data[0] && r.data[0].label_name) || 'tu sello';
+    toast('¡Listo! Ya tienes acceso a ' + name);
+    $('#noLabel').hidden = true; $('#claimCode').value = '';
+    start();
+  });
+  $('#openClaim').addEventListener('click', function () { showClaim(true); });
+  $('#cancelClaim').addEventListener('click', function () { $('#noLabel').hidden = true; start(); });
+
   async function start() {
     $('#loginForm').hidden = true;
-    var m = await sb.from('label_members').select('label_id');
-    var ids = (m.data || []).map(function (x) { return x.label_id; });
-    if (!ids.length) { $('#noLabel').hidden = false; $('#hdr').hidden = false; $('#periodSel').hidden = true; return; }
-    var l = await sb.from('labels').select('id,name,logo_url').in('id', ids).order('name');
+    var ad = await sb.from('admins').select('email');
+    isAdmin = !!(ad.data && ad.data.length);
+    var l;
+    if (isAdmin && !pendingCode()) {
+      // Administradores: ven el portal de cualquier sello
+      l = await sb.from('labels').select('id,name,logo_url').order('name');
+      if (!(l.data || []).length) { $('#cfgErr').textContent = 'Aún no hay sellos creados.'; $('#cfgErr').hidden = false; $('#hdr').hidden = false; return; }
+      $('#adminBanner').hidden = false; $('#periodSel').hidden = false;
+    } else {
+      var m = await sb.from('label_members').select('label_id');
+      var ids = (m.data || []).map(function (x) { return x.label_id; });
+      if (!ids.length || pendingCode()) { showClaim(ids.length > 0); return; }
+      $('#periodSel').hidden = false; $('#openClaim').hidden = false;
+      l = await sb.from('labels').select('id,name,logo_url').in('id', ids).order('name');
+    }
     labels = l.data || [];
     var sel = $('#labelSel');
     sel.innerHTML = labels.map(function (x) { return '<option value="' + x.id + '">' + esc(x.name) + '</option>'; }).join('');
     sel.hidden = labels.length < 2;
     sel.onchange = function () { loadLabel(Number(sel.value)); };
     $('#hdr').hidden = false;
-    loadLabel(labels[0].id);
+    var first = labels.find(function (x) { return x.id === viewParam; }) || labels[0];
+    sel.value = String(first.id);
+    loadLabel(first.id);
   }
 
   async function loadLabel(id) {
@@ -396,7 +448,7 @@ tbody tr:hover{background:rgba(255,255,255,.03)}
       }).join('') || '<tr><td colspan="8" class="empty">Nada que retirar con este filtro.</td></tr>') + '</tbody>';
     updateReqBtn();
   }
-  function updateReqBtn() { var b = $('#tsfRequest'); b.disabled = !selected.size; b.textContent = 'Solicitar retirada (' + selected.size + ')'; }
+  function updateReqBtn() { var b = $('#tsfRequest'); b.hidden = isAdmin; b.disabled = !selected.size; b.textContent = 'Solicitar retirada (' + selected.size + ')'; }
   $('#tsfFilter').addEventListener('change', function () { selected.clear(); $('#tsfAll').checked = false; renderTsf($('#periodSel').value); });
   $('#tsfAccount').addEventListener('change', function () { selected.clear(); $('#tsfAll').checked = false; renderTsf($('#periodSel').value); });
   $('#tsfTable').addEventListener('change', function (e) {

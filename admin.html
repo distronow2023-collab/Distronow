@@ -217,9 +217,7 @@ main{padding:28px 0 60px}
         <h2 style="margin:28px 0 6px;font-family:'Archivo',sans-serif;font-stretch:112%;font-weight:800;font-size:18px">Solicitudes de distribución</h2>
         <label class="switch" style="flex-direction:row"><input type="checkbox" id="appsOpen"> Aceptar nuevas solicitudes en la web</label>
         <p class="help" style="margin-top:6px">Si lo desactivas, el formulario se sustituye por un aviso de "solicitudes cerradas" y el botón de la portada lleva a Contacto.</p>
-        <h2 style="margin:22px 0 6px;font-family:'Archivo',sans-serif;font-stretch:112%;font-weight:800;font-size:18px">Login del panel</h2>
-        <label class="switch" style="flex-direction:row"><input type="checkbox" id="loginDark"> Mostrar el login en modo oscuro</label>
-        <p class="help" style="margin-top:6px">Oscurece el formulario del proveedor con un filtro. Revísalo en la web después de activarlo: puede alterar logos o colores del formulario.</p>
+        
         <h2 style="margin:22px 0 6px;font-family:'Archivo',sans-serif;font-stretch:112%;font-weight:800;font-size:18px">Herramienta de track fee (sellos)</h2>
         <label style="max-width:320px">Umbral de royalties por pista (AUD al mes)<input type="number" id="tsfThreshold" min="0" step="0.01" value="1.00"></label>
         <p class="help" style="margin-top:6px">Las pistas que generan menos de esta cifra de media aparecen en el filtro "Por debajo del umbral" del back-office de sellos. La política interna es retirar las que generan menos de 0,60 € al mes: convierte esa cifra a AUD con el tipo de cambio actual.</p>
@@ -484,8 +482,17 @@ main{padding:28px 0 60px}
         '<summary style="cursor:pointer;display:flex;gap:12px;align-items:center;flex-wrap:wrap;list-style:none">' +
         '<span class="thumb" style="width:44px;height:44px">' + (l.logo_url ? '<img src="' + esc(l.logo_url) + '" alt="">' : esc(initials(l.name))) + '</span>' +
         '<b style="font-family:Archivo,sans-serif;font-stretch:112%;font-size:16px">' + esc(l.name) + '</b>' +
-        '<span class="sub">' + l.accounts.length + ' cuentas · ' + l.members.length + ' personas con acceso</span></summary>' +
+        '<span class="sub">' + l.accounts.length + ' cuentas · ' + l.members.length + ' personas con acceso</span>' +
+        (l.claim_code ? '<span class="tag tag--warn">Pendiente de reclamar</span>' : (l.members.length ? '<span class="tag tag--ok">Reclamado</span>' : '')) + '</summary>' +
         '<div style="display:grid;gap:14px;margin-top:14px">' +
+        '<div class="card" style="background:rgba(0,157,255,.07);border-color:rgba(120,200,255,.3);padding:14px;display:grid;gap:8px">' +
+        '<b style="font-size:13px;color:var(--muted)">Código para reclamar el sello</b>' +
+        (l.claim_code
+          ? '<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><span style="font-family:IBM Plex Mono,monospace;font-size:18px;letter-spacing:.08em;color:#fff">' + esc(l.claim_code) + '</span>' +
+            '<button class="btn btn--sm" data-act="copyLink">Copiar enlace</button><button class="btn btn--sm" data-act="copyMsg">Copiar mensaje</button><button class="btn btn--sm" data-act="newCode">Generar otro</button><button class="btn btn--danger btn--sm" data-act="noCode">Desactivar</button></div>' +
+            '<span class="sub">Un solo uso: quien lo use entra como responsable del sello y el código se desactiva.</span>'
+          : '<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><span class="sub">' + (l.claimed_at ? 'Reclamado el ' + fmtDate(l.claimed_at) + '.' : 'Sin código activo.') + ' Genera uno nuevo si otra persona del sello necesita acceso.</span><button class="btn btn--sm" data-act="newCode">Generar código</button></div>') +
+        '</div>' +
         '<label>Nombre<input type="text" data-field="name" value="' + esc(l.name) + '"></label>' +
         '<label>Cuentas del panel (un email por línea)<textarea data-field="accounts" rows="5" style="min-height:110px;padding:10px 12px;border-radius:10px;border:1px solid rgba(255,255,255,.18);background:rgba(5,11,16,.7);color:#fff;font:inherit">' + esc(l.accounts.join('\n')) + '</textarea></label>' +
         '<div><button class="btn btn--sm" data-act="saveAcc">Guardar cuentas</button></div>' +
@@ -493,15 +500,24 @@ main{padding:28px 0 60px}
         (l.members.map(function (m) { return '<span class="tag" style="border:1px solid var(--line);display:inline-flex;gap:6px;align-items:center;padding:4px 10px">' + esc(m) + ' <button class="btn btn--sm" style="min-height:22px;padding:0 6px" data-act="delMember" data-email="' + esc(m) + '" aria-label="Quitar">×</button></span>'; }).join('') || '<span class="sub">Nadie todavía.</span>') +
         '</div><div class="toolbar" style="margin:10px 0 0"><label>Email<input type="email" data-field="newMember" placeholder="aandr@sello.com"></label><button class="btn btn--primary btn--sm" data-act="addMember">Dar acceso e invitar</button></div></div>' +
         '<label>Notas internas (condiciones, cuota…)<input type="text" data-field="notes" value="' + esc(l.notes || '') + '" placeholder="Solo las ve el admin"></label>' +
-        '<div style="display:flex;gap:10px;flex-wrap:wrap"><label class="btn btn--sm" style="display:inline-flex;align-items:center;flex-direction:row;color:#fff">Cambiar logo<input type="file" data-field="logo" accept="image/*" hidden></label>' +
+        '<div style="display:flex;gap:10px;flex-wrap:wrap"><a class="btn btn--primary btn--sm" style="display:inline-flex;align-items:center;text-decoration:none" target="_blank" rel="noopener" href="/sellos?ver=' + l.id + '">Ver como el sello ↗</a><label class="btn btn--sm" style="display:inline-flex;align-items:center;flex-direction:row;color:#fff">Cambiar logo<input type="file" data-field="logo" accept="image/*" hidden></label>' +
         '<button class="btn btn--danger btn--sm" data-act="delLabel">Eliminar sello</button></div>' +
         '</div></details>';
     }).join('') || '<div class="empty">Aún no hay sellos. Crea el primero arriba.</div>';
   }
+  function newCode() {
+    var A = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789', out = 'DN-', b = new Uint32Array(8);
+    crypto.getRandomValues(b); for (var i = 0; i < 8; i++) out += A[b[i] % A.length];
+    return out;
+  }
+  function claimLink(code) { return location.origin + '/sellos?codigo=' + encodeURIComponent(code); }
+  function copy(text, ok) {
+    (navigator.clipboard ? navigator.clipboard.writeText(text) : Promise.reject()).then(function () { toast(ok); }, function () { prompt('Copia este texto:', text); });
+  }
   $('#labelForm').addEventListener('submit', function (e) {
     e.preventDefault();
     var name = $('#lName').value.trim(); if (!name) return;
-    sb.from('labels').insert({ name: name }).then(function (r) { if (r.error) return fail(r.error); $('#labelForm').reset(); toast('Sello creado'); loadLabels(); });
+    sb.from('labels').insert({ name: name, claim_code: newCode() }).then(function (r) { if (r.error) return fail(r.error); $('#labelForm').reset(); toast('Sello creado'); loadLabels(); });
   });
   $('#labelList').addEventListener('change', function (e) {
     var f = e.target.dataset.field; if (!f || f === 'accounts' || f === 'newMember') return;
@@ -522,6 +538,10 @@ main{padding:28px 0 60px}
     var b = e.target.closest('[data-act]'); if (!b) return;
     e.preventDefault();
     var box = b.closest('[data-i]'), l = labels[Number(box.dataset.i)];
+    if (b.dataset.act === 'copyLink') copy(claimLink(l.claim_code), 'Enlace copiado');
+    if (b.dataset.act === 'copyMsg') copy('Hola! Ya tenéis acceso al back-office de DistroNow para ' + l.name + ', donde podéis ver vuestras cuentas, pistas, royalties y el track fee.\n\n1. Entra en ' + claimLink(l.claim_code) + '\n2. Pon tu email y abre el enlace que te llega.\n3. Si te lo pide, introduce este código: ' + l.claim_code + '\n\nEl código es de un solo uso. Cualquier duda, escríbenos a info@distronow.com.', 'Mensaje copiado');
+    if (b.dataset.act === 'newCode') sb.from('labels').update({ claim_code: newCode() }).eq('id', l.id).then(function (r) { if (r.error) return fail(r.error); toast('Código nuevo generado'); loadLabels(); });
+    if (b.dataset.act === 'noCode' && confirm('¿Desactivar el código de ' + l.name + '?')) sb.from('labels').update({ claim_code: null }).eq('id', l.id).then(function (r) { if (r.error) return fail(r.error); toast('Código desactivado'); loadLabels(); });
     if (b.dataset.act === 'saveAcc') {
       var emails = Array.from(new Set(box.querySelector('[data-field="accounts"]').value.split(/[\s,;]+/).map(function (x) { return x.trim().toLowerCase(); }).filter(function (x) { return /@/.test(x); })));
       sb.from('label_accounts').delete().eq('label_id', l.id).then(function (r) {
@@ -686,7 +706,6 @@ main{padding:28px 0 60px}
       (r.data || []).forEach(function (f) {
         if (f.key === 'carousel_speed') { $('#speed').value = f.value; $('#speedOut').textContent = f.value; }
         if (f.key === 'applications_open') $('#appsOpen').checked = f.value === 'true';
-        if (f.key === 'login_dark') $('#loginDark').checked = f.value === 'true';
         if (f.key === 'tsf_threshold_aud') $('#tsfThreshold').value = f.value;
       });
     });
@@ -696,7 +715,6 @@ main{padding:28px 0 60px}
     sb.from('settings').upsert([
       { key: 'carousel_speed', value: String($('#speed').value) },
       { key: 'applications_open', value: String($('#appsOpen').checked) },
-      { key: 'login_dark', value: String($('#loginDark').checked) },
       { key: 'tsf_threshold_aud', value: String(Math.max(0, Number($('#tsfThreshold').value) || 0)) }
     ]).then(function (r) {
       if (r.error) return fail(r.error);
