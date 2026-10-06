@@ -202,7 +202,7 @@ tbody tr:hover{background:rgba(255,255,255,.03)}
   /* ---------- Arranque y acceso ---------- */
   fetch('/api/config').then(function (r) { return r.json(); }).then(function (cfg) {
     if (!cfg.url || !cfg.anonKey) { $('#cfgErr').hidden = false; return; }
-    sb = window.supabase.createClient(cfg.url, cfg.anonKey);
+    sb = window.supabase.createClient(String(cfg.url).trim().replace(/\/+$/, '').replace(/\/rest\/v1$/, ''), cfg.anonKey);
     fetch('/api/settings').then(function (r) { return r.json(); }).then(function (s) { if (s && s.tsfThreshold) threshold = Number(s.tsfThreshold) || 1; }).catch(function () {});
     sb.auth.onAuthStateChange(function (ev, s) { if (s && !session) { session = s; start(); } });
     sb.auth.getSession().then(function (r) { if (r.data.session) { session = r.data.session; start(); } else { $('#loginForm').hidden = false; } });
