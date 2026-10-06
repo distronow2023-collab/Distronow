@@ -87,9 +87,10 @@ main{padding:28px 0 60px}
     <!-- Login -->
     <form class="card login" id="loginForm" hidden>
       <h1>Acceso al panel</h1>
-      <label>Email<input type="email" id="email" autocomplete="username" required></label>
-      <label>Contraseña<input type="password" id="password" autocomplete="current-password" required></label>
-      <button class="btn btn--primary" type="submit" id="loginBtn">Entrar</button>
+      <p class="help" style="margin:0">Escribe tu email de administrador y te enviaremos un enlace para entrar. No hace falta contraseña.</p>
+      <label>Email<input type="email" id="email" autocomplete="email" required></label>
+      <button class="btn btn--primary" type="submit" id="loginBtn">Enviarme el enlace</button>
+      <p class="help" id="loginOk" role="status" hidden style="margin:0;color:#8BEBBE">Listo. Revisa tu correo y abre el enlace desde este mismo navegador.</p>
       <p class="err" id="loginError" hidden></p>
     </form>
 
@@ -256,7 +257,10 @@ main{padding:28px 0 60px}
   fetch('/api/config').then(function (r) { return r.json(); }).then(function (cfg) {
     if (!cfg.url || !cfg.anonKey) { $('#configError').hidden = false; return; }
     sb = window.supabase.createClient(cfg.url, cfg.anonKey);
-    sb.auth.getSession().then(function (r) { r.data.session ? enter() : showLogin(); });
+    var entered = false;
+    function go() { if (!entered) { entered = true; enter(); } }
+    sb.auth.onAuthStateChange(function (ev, sess) { if (sess) go(); });
+    sb.auth.getSession().then(function (r) { r.data.session ? go() : showLogin(); });
   }).catch(function () { $('#configError').hidden = false; });
 
   function showLogin() { $('#loginForm').hidden = false; $('#app').hidden = true; $('#hdrActions').hidden = true; }
@@ -264,14 +268,15 @@ main{padding:28px 0 60px}
   $('#loginForm').addEventListener('submit', function (e) {
     e.preventDefault();
     var btn = $('#loginBtn'); btn.disabled = true; $('#loginError').hidden = true;
-    sb.auth.signInWithPassword({ email: $('#email').value.trim(), password: $('#password').value })
+    $('#loginOk').hidden = true;
+    sb.auth.signInWithOtp({ email: $('#email').value.trim().toLowerCase(), options: { emailRedirectTo: location.origin + '/admin' } })
       .then(function (r) {
         btn.disabled = false;
-        if (r.error) { $('#loginError').textContent = 'Email o contraseña incorrectos.'; $('#loginError').hidden = false; return; }
-        enter();
+        if (r.error) { $('#loginError').textContent = 'No se pudo enviar el enlace. Espera un minuto y vuelve a intentarlo.'; $('#loginError').hidden = false; return; }
+        $('#loginOk').hidden = false;
       });
   });
-  $('#logout').addEventListener('click', function () { sb.auth.signOut().then(showLogin); });
+  $('#logout').addEventListener('click', function () { sb.auth.signOut().then(function () { location.reload(); }); });
 
   function enter() {
     $('#loginForm').hidden = true; $('#app').hidden = false; $('#hdrActions').hidden = false;
